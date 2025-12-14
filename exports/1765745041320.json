@@ -1,0 +1,15 @@
+{
+  "timestamp": 1765745041320,
+  "operation": {
+    "id": "backend:server:main"
+  },
+  "projectId": "build-a-production-ready-web",
+  "files": [
+    {
+      "path": "/mnt/data/build-a-production-ready-web/backend/server.ts",
+      "type": "text",
+      "size": 27090,
+      "dependencies": false
+    }
+  ]
+}

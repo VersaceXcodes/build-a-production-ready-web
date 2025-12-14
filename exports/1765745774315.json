@@ -1,0 +1,19 @@
+{
+  "timestamp": 1765745774315,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "UV_JobDetail",
+      "version": "latest"
+    }
+  },
+  "projectId": "build-a-production-ready-web",
+  "files": [
+    {
+      "path": "/mnt/data/build-a-production-ready-web/vitereact/src/components/views/UV_JobDetail.tsx",
+      "type": "text",
+      "size": 40299,
+      "dependencies": false
+    }
+  ]
+}

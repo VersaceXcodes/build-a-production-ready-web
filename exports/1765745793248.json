@@ -1,0 +1,19 @@
+{
+  "timestamp": 1765745793248,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "UV_QuoteBuilder",
+      "version": "latest"
+    }
+  },
+  "projectId": "build-a-production-ready-web",
+  "files": [
+    {
+      "path": "/mnt/data/build-a-production-ready-web/vitereact/src/components/views/UV_QuoteBuilder.tsx",
+      "type": "text",
+      "size": 43459,
+      "dependencies": false
+    }
+  ]
+}

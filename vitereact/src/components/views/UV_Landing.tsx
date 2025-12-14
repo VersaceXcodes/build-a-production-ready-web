@@ -1,0 +1,521 @@
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import { useAppStore } from '@/store/main';
+import { CheckCircle, Clock, DollarSign, ArrowRight, Sparkles, Upload, MessageSquare, Calendar, CheckSquare } from 'lucide-react';
+
+// ============================================================================
+// TYPE DEFINITIONS
+// ============================================================================
+
+interface Service {
+  id: string;
+  category_id: string;
+  name: string;
+  slug: string;
+  description: string;
+  requires_booking: boolean;
+  requires_proof: boolean;
+  is_top_seller: boolean;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+interface GalleryItem {
+  id: string;
+  image_url: string;
+  title: string | null;
+  tag: string | null;
+  category: string | null;
+  service_id: string | null;
+  case_study_id: string | null;
+  is_visible: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+interface ServicesApiResponse {
+  services: Service[];
+  total: number;
+}
+
+interface GalleryApiResponse {
+  items: GalleryItem[];
+  total: number;
+}
+
+// ============================================================================
+// API FUNCTIONS
+// ============================================================================
+
+const fetchTopSellingServices = async (): Promise<Service[]> => {
+  const response = await axios.get<ServicesApiResponse>(
+    `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/services`,
+    {
+      params: {
+        is_active: true,
+        is_top_seller: true,
+        limit: 6,
+        sort_by: 'name',
+        sort_order: 'asc',
+      },
+    }
+  );
+  return response.data.services || [];
+};
+
+const fetchGalleryPreview = async (): Promise<GalleryItem[]> => {
+  const response = await axios.get<GalleryApiResponse>(
+    `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/gallery-items`,
+    {
+      params: {
+        is_visible: true,
+        limit: 8,
+        sort_by: 'sort_order',
+        sort_order: 'asc',
+      },
+    }
+  );
+  return response.data.items || [];
+};
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
+const UV_Landing: React.FC = () => {
+  const navigate = useNavigate();
+
+  // CRITICAL: Individual selectors, no object destructuring
+  const isAuthenticated = useAppStore(
+    (state) => state.authentication_state.authentication_status.is_authenticated
+  );
+
+  // Fetch top selling services
+  const {
+    data: topSellingServices = [],
+    isLoading: isLoadingServices,
+    error: servicesError,
+  } = useQuery<Service[]>({
+    queryKey: ['top-selling-services'],
+    queryFn: fetchTopSellingServices,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1,
+  });
+
+  // Fetch gallery preview
+  const {
+    data: galleryPreviewItems = [],
+    isLoading: isLoadingGallery,
+    error: galleryError,
+  } = useQuery<GalleryItem[]>({
+    queryKey: ['gallery-preview'],
+    queryFn: fetchGalleryPreview,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1,
+  });
+
+  // Navigation handlers
+  const handleGetQuoteClick = () => {
+    if (isAuthenticated) {
+      navigate('/app/quotes/new');
+    } else {
+      navigate('/login?redirect_url=/app/quotes/new');
+    }
+  };
+
+  const handleServiceCardClick = (serviceSlug: string) => {
+    navigate(`/services/${serviceSlug}`);
+  };
+
+  return (
+    <>
+      {/* Hero Section */}
+      <section className="relative bg-black text-white py-20 md:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black opacity-90"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            {/* Brand Positioning */}
+            <div className="flex items-center justify-center mb-6">
+              <Sparkles className="w-8 h-8 text-yellow-400 mr-3" />
+              <span className="text-yellow-400 font-bold text-sm uppercase tracking-wider">
+                Premium Print & Branding Solutions
+              </span>
+            </div>
+
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+              Personalise First,
+              <br />
+              <span className="text-yellow-400">Deliver Excellence</span>
+            </h1>
+
+            <p className="text-lg md:text-xl text-gray-300 mb-10 max-w-3xl mx-auto leading-relaxed">
+              From business cards to vehicle graphics, we bring your brand to life with 
+              disciplined timelines, transparent pricing, and uncompromising quality.
+            </p>
+
+            {/* Dual CTAs */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <button
+                onClick={handleGetQuoteClick}
+                className="group relative w-full sm:w-auto px-8 py-4 bg-yellow-400 text-black font-bold rounded-lg 
+                         hover:bg-yellow-500 transition-all duration-200 transform hover:scale-105 
+                         shadow-lg hover:shadow-2xl flex items-center justify-center"
+              >
+                Get Your Custom Quote
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+
+              <Link
+                to="/gallery"
+                className="w-full sm:w-auto px-8 py-4 bg-white text-black font-semibold rounded-lg 
+                         hover:bg-gray-100 transition-all duration-200 border-2 border-white 
+                         flex items-center justify-center"
+              >
+                View Our Portfolio
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Top Selling Services Section */}
+      <section className="py-16 md:py-24 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">
+              Our Top Services
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Discover our most popular solutions, trusted by businesses across Ireland
+            </p>
+          </div>
+
+          {/* Loading State */}
+          {isLoadingServices && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 animate-pulse"
+                >
+                  <div className="h-6 bg-gray-200 rounded mb-4 w-3/4"></div>
+                  <div className="h-4 bg-gray-200 rounded mb-2 w-full"></div>
+                  <div className="h-4 bg-gray-200 rounded mb-2 w-5/6"></div>
+                  <div className="h-4 bg-gray-200 rounded mb-6 w-4/6"></div>
+                  <div className="h-10 bg-gray-200 rounded w-full"></div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Error State */}
+          {servicesError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+              <p className="text-red-700 font-medium">
+                Unable to load services. Please try again later.
+              </p>
+            </div>
+          )}
+
+          {/* Services Grid */}
+          {!isLoadingServices && !servicesError && topSellingServices.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {topSellingServices.map((service) => (
+                <div
+                  key={service.id}
+                  className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 
+                           hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 
+                           flex flex-col"
+                >
+                  <h3 className="text-xl font-bold text-black mb-3">{service.name}</h3>
+                  <p className="text-gray-600 mb-6 flex-grow leading-relaxed">
+                    {service.description.length > 120
+                      ? `${service.description.substring(0, 120)}...`
+                      : service.description}
+                  </p>
+                  <button
+                    onClick={() => handleServiceCardClick(service.slug)}
+                    className="w-full px-6 py-3 bg-black text-white font-semibold rounded-lg 
+                             hover:bg-gray-800 transition-all duration-200 flex items-center justify-center"
+                  >
+                    Learn More
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* No Services State */}
+          {!isLoadingServices && !servicesError && topSellingServices.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-600 text-lg">
+                Our services are currently being updated. Please check back soon!
+              </p>
+            </div>
+          )}
+
+          {/* View All Services Link */}
+          {topSellingServices.length > 0 && (
+            <div className="text-center mt-12">
+              <Link
+                to="/services"
+                className="inline-flex items-center text-black font-semibold hover:text-gray-700 
+                         transition-colors text-lg"
+              >
+                View All Services
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Link>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Gallery Preview Section */}
+      <section className="py-16 md:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">
+              Our Recent Work
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              See how we've helped businesses stand out with stunning print and branding solutions
+            </p>
+          </div>
+
+          {/* Loading State */}
+          {isLoadingGallery && (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                <div
+                  key={i}
+                  className="aspect-square bg-gray-200 rounded-lg animate-pulse"
+                ></div>
+              ))}
+            </div>
+          )}
+
+          {/* Error State */}
+          {galleryError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+              <p className="text-red-700 font-medium">
+                Unable to load gallery. Please try again later.
+              </p>
+            </div>
+          )}
+
+          {/* Gallery Grid */}
+          {!isLoadingGallery && !galleryError && galleryPreviewItems.length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {galleryPreviewItems.map((item) => (
+                <Link
+                  key={item.id}
+                  to="/gallery"
+                  className="group relative aspect-square overflow-hidden rounded-lg shadow-md 
+                           hover:shadow-xl transition-all duration-300"
+                >
+                  <img
+                    src={item.image_url}
+                    alt={item.title || 'Portfolio item'}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                  {item.title && (
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent 
+                                  opacity-0 group-hover:opacity-100 transition-opacity duration-300 
+                                  flex items-end p-4">
+                      <p className="text-white font-semibold text-sm">{item.title}</p>
+                    </div>
+                  )}
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {/* View Full Gallery CTA */}
+          {galleryPreviewItems.length > 0 && (
+            <div className="text-center mt-12">
+              <Link
+                to="/gallery"
+                className="inline-flex items-center px-8 py-4 bg-yellow-400 text-black font-bold 
+                         rounded-lg hover:bg-yellow-500 transition-all duration-200 shadow-lg 
+                         hover:shadow-xl transform hover:scale-105"
+              >
+                View Full Portfolio
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Link>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-16 md:py-24 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">
+              How It Works
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Our streamlined process ensures your project is delivered on time, every time
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+            {/* Step 1 */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 text-center 
+                          hover:shadow-xl transition-shadow duration-300">
+              <div className="w-16 h-16 bg-yellow-400 text-black rounded-full flex items-center 
+                            justify-center text-2xl font-bold mx-auto mb-4">
+                1
+              </div>
+              <Sparkles className="w-8 h-8 text-black mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-black mb-2">Choose Service</h3>
+              <p className="text-sm text-gray-600">
+                Select from our range of print and branding solutions
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 text-center 
+                          hover:shadow-xl transition-shadow duration-300">
+              <div className="w-16 h-16 bg-yellow-400 text-black rounded-full flex items-center 
+                            justify-center text-2xl font-bold mx-auto mb-4">
+                2
+              </div>
+              <MessageSquare className="w-8 h-8 text-black mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-black mb-2">Get Quote</h3>
+              <p className="text-sm text-gray-600">
+                Provide project details and receive transparent pricing
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 text-center 
+                          hover:shadow-xl transition-shadow duration-300">
+              <div className="w-16 h-16 bg-yellow-400 text-black rounded-full flex items-center 
+                            justify-center text-2xl font-bold mx-auto mb-4">
+                3
+              </div>
+              <Calendar className="w-8 h-8 text-black mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-black mb-2">Book Slot</h3>
+              <p className="text-sm text-gray-600">
+                Choose your preferred delivery timeline
+              </p>
+            </div>
+
+            {/* Step 4 */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 text-center 
+                          hover:shadow-xl transition-shadow duration-300">
+              <div className="w-16 h-16 bg-yellow-400 text-black rounded-full flex items-center 
+                            justify-center text-2xl font-bold mx-auto mb-4">
+                4
+              </div>
+              <CheckSquare className="w-8 h-8 text-black mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-black mb-2">Approve Proof</h3>
+              <p className="text-sm text-gray-600">
+                Review and approve your design before production
+              </p>
+            </div>
+
+            {/* Step 5 */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 text-center 
+                          hover:shadow-xl transition-shadow duration-300">
+              <div className="w-16 h-16 bg-yellow-400 text-black rounded-full flex items-center 
+                            justify-center text-2xl font-bold mx-auto mb-4">
+                5
+              </div>
+              <Upload className="w-8 h-8 text-black mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-black mb-2">Receive Order</h3>
+              <p className="text-sm text-gray-600">
+                Get your high-quality print delivered on schedule
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust Blocks Section */}
+      <section className="py-16 md:py-24 bg-black text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Why Choose SultanStamp?
+            </h2>
+            <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+              Three core principles that drive everything we do
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Quality */}
+            <div className="bg-gray-900 rounded-xl p-8 text-center hover:bg-gray-800 
+                          transition-colors duration-300 border border-gray-800">
+              <div className="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="w-8 h-8 text-black" />
+              </div>
+              <h3 className="text-2xl font-bold mb-3 text-yellow-400">Uncompromising Quality</h3>
+              <p className="text-gray-300 leading-relaxed">
+                Premium materials, expert craftsmanship, and rigorous quality control 
+                ensure your brand looks its absolute best
+              </p>
+            </div>
+
+            {/* Timelines */}
+            <div className="bg-gray-900 rounded-xl p-8 text-center hover:bg-gray-800 
+                          transition-colors duration-300 border border-gray-800">
+              <div className="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="w-8 h-8 text-black" />
+              </div>
+              <h3 className="text-2xl font-bold mb-3 text-yellow-400">Disciplined Timelines</h3>
+              <p className="text-gray-300 leading-relaxed">
+                Clear deadlines, real-time tracking, and on-schedule delivery. 
+                Your project arrives when we promise it will
+              </p>
+            </div>
+
+            {/* Pricing */}
+            <div className="bg-gray-900 rounded-xl p-8 text-center hover:bg-gray-800 
+                          transition-colors duration-300 border border-gray-800">
+              <div className="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                <DollarSign className="w-8 h-8 text-black" />
+              </div>
+              <h3 className="text-2xl font-bold mb-3 text-yellow-400">Transparent Pricing</h3>
+              <p className="text-gray-300 leading-relaxed">
+                No hidden fees, no surprises. Get instant quotes with detailed breakdowns 
+                before you commit
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
+      <section className="py-16 md:py-20 bg-gradient-to-br from-yellow-400 to-yellow-500">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">
+            Ready to Elevate Your Brand?
+          </h2>
+          <p className="text-lg text-gray-900 mb-8 max-w-2xl mx-auto">
+            Get your custom quote in minutes and start your project with Ireland's 
+            most reliable print partner
+          </p>
+          <button
+            onClick={handleGetQuoteClick}
+            className="inline-flex items-center px-10 py-5 bg-black text-white font-bold 
+                     rounded-lg hover:bg-gray-800 transition-all duration-200 shadow-xl 
+                     hover:shadow-2xl transform hover:scale-105 text-lg"
+          >
+            Get Your Free Quote Now
+            <ArrowRight className="ml-3 w-6 h-6" />
+          </button>
+        </div>
+      </section>
+    </>
+  );
+};
+
+export default UV_Landing;

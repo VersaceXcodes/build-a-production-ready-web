@@ -1,0 +1,7344 @@
+openapi: 3.0.0
+info:
+  title: SultanStamp API
+  version: 1.0.0
+  description: Complete API specification for SultanStamp premium print, branding,
+    and signage business web application
+servers:
+  - url: http://localhost:3000
+    description: Development server
+security:
+  - BearerAuth: []
+paths:
+  /api/auth/register:
+    post:
+      operationId: registerUser
+      summary: Register new customer account
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - name
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                name:
+                  type: string
+                phone:
+                  type: string
+                  nullable: true
+                company_name:
+                  type: string
+                  nullable: true
+      responses:
+        "201":
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+                  token:
+                    type: string
+  /api/auth/login:
+    post:
+      operationId: loginUser
+      summary: Authenticate user and return JWT token
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - role
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                role:
+                  type: string
+                  enum:
+                    - CUSTOMER
+                    - STAFF
+                    - ADMIN
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+                  token:
+                    type: string
+  /api/auth/logout:
+    post:
+      operationId: logoutUser
+      summary: Logout current user
+      tags:
+        - Authentication
+      responses:
+        "200":
+          description: Logout successful
+  /api/auth/forgot-password:
+    post:
+      operationId: forgotPassword
+      summary: Request password reset email
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        "200":
+          description: Password reset email sent
+  /api/auth/reset-password:
+    post:
+      operationId: resetPassword
+      summary: Reset password with token
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - token
+                - new_password
+              properties:
+                token:
+                  type: string
+                new_password:
+                  type: string
+      responses:
+        "200":
+          description: Password reset successful
+  /api/auth/verify-email:
+    post:
+      operationId: verifyEmail
+      summary: Verify email address with token
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - token
+              properties:
+                token:
+                  type: string
+      responses:
+        "200":
+          description: Email verified successfully
+  /api/auth/me:
+    get:
+      operationId: getCurrentUser
+      summary: Get current authenticated user
+      tags:
+        - Authentication
+      responses:
+        "200":
+          description: Current user data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /api/public/services/categories:
+    get:
+      operationId: getPublicServiceCategories
+      summary: Get all active service categories
+      tags:
+        - Public
+      security: []
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+        - name: is_active
+          in: query
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            enum:
+              - name
+              - sort_order
+              - created_at
+            default: sort_order
+        - name: sort_order
+          in: query
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+      responses:
+        "200":
+          description: List of service categories
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ServiceCategory"
+                  total:
+                    type: integer
+  /api/public/services/categories/{id}:
+    get:
+      operationId: getPublicServiceCategory
+      summary: Get specific service category
+      tags:
+        - Public
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Service category details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceCategory"
+  /api/public/services:
+    get:
+      operationId: getPublicServices
+      summary: Get all active services
+      tags:
+        - Public
+      security: []
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+        - name: category_id
+          in: query
+          schema:
+            type: string
+        - name: is_active
+          in: query
+          schema:
+            type: boolean
+        - name: is_top_seller
+          in: query
+          schema:
+            type: boolean
+        - name: requires_booking
+          in: query
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            enum:
+              - name
+              - base_price
+              - created_at
+            default: name
+        - name: sort_order
+          in: query
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+      responses:
+        "200":
+          description: List of services
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Service"
+                  total:
+                    type: integer
+  /api/public/services/{id}:
+    get:
+      operationId: getPublicService
+      summary: Get specific service with options
+      tags:
+        - Public
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Service details with configuration options
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  service:
+                    $ref: "#/components/schemas/Service"
+                  options:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ServiceOption"
+  /api/public/tiers:
+    get:
+      operationId: getPublicTiers
+      summary: Get all active tiers
+      tags:
+        - Public
+      security: []
+      parameters:
+        - name: is_active
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of tiers with features
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    tier:
+                      $ref: "#/components/schemas/Tier"
+                    features:
+                      type: array
+                      items:
+                        $ref: "#/components/schemas/TierFeature"
+  /api/public/tiers/{id}:
+    get:
+      operationId: getPublicTier
+      summary: Get specific tier with features and deliverables
+      tags:
+        - Public
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Tier details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tier:
+                    $ref: "#/components/schemas/Tier"
+                  features:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/TierFeature"
+                  deliverables:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/TierDeliverable"
+  /api/public/gallery:
+    get:
+      operationId: getPublicGalleryItems
+      summary: Get all visible gallery items
+      tags:
+        - Public
+      security: []
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+        - name: service_category_id
+          in: query
+          schema:
+            type: string
+        - name: service_id
+          in: query
+          schema:
+            type: string
+        - name: is_featured
+          in: query
+          schema:
+            type: boolean
+        - name: is_visible
+          in: query
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            enum:
+              - title
+              - sort_order
+              - created_at
+            default: sort_order
+        - name: sort_order
+          in: query
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+      responses:
+        "200":
+          description: List of gallery items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/GalleryItem"
+                  total:
+                    type: integer
+  /api/public/gallery/{id}:
+    get:
+      operationId: getPublicGalleryItem
+      summary: Get specific gallery item with images
+      tags:
+        - Public
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Gallery item details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  item:
+                    $ref: "#/components/schemas/GalleryItem"
+                  images:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/GalleryImage"
+  /api/public/contact-inquiries:
+    post:
+      operationId: createContactInquiry
+      summary: Submit contact inquiry form
+      tags:
+        - Public
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - subject
+                - message
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
+                  nullable: true
+                subject:
+                  type: string
+                message:
+                  type: string
+      responses:
+        "201":
+          description: Inquiry submitted successfully
+  /api/public/content-sections:
+    get:
+      operationId: getPublicContentSections
+      summary: Get all content sections for public pages
+      tags:
+        - Public
+      security: []
+      responses:
+        "200":
+          description: List of content sections
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContentSection"
+  /api/public/faqs:
+    get:
+      operationId: getPublicFAQs
+      summary: Get all active FAQs
+      tags:
+        - Public
+      security: []
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of FAQs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FAQ"
+  /api/public/team-members:
+    get:
+      operationId: getPublicTeamMembers
+      summary: Get all visible team members
+      tags:
+        - Public
+      security: []
+      responses:
+        "200":
+          description: List of team members
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TeamMember"
+  /api/customer/quotes:
+    get:
+      operationId: getCustomerQuotes
+      summary: Get all quotes for current customer
+      tags:
+        - Customer - Quotes
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+        - name: service_id
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum:
+              - QUOTE_REQUESTED
+              - UNDER_REVIEW
+              - PENDING_APPROVAL
+              - FINALIZED
+              - REJECTED
+              - EXPIRED
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            enum:
+              - quote_number
+              - created_at
+              - total_amount
+            default: created_at
+        - name: sort_order
+          in: query
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: desc
+      responses:
+        "200":
+          description: List of customer quotes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Quote"
+                  total:
+                    type: integer
+    post:
+      operationId: createCustomerQuote
+      summary: Create new quote request
+      tags:
+        - Customer - Quotes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - service_id
+              properties:
+                service_id:
+                  type: string
+                tier_id:
+                  type: string
+                  nullable: true
+                customer_notes:
+                  type: string
+                  nullable: true
+                no_design_files:
+                  type: boolean
+      responses:
+        "201":
+          description: Quote created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quote"
+  /api/customer/quotes/{id}:
+    get:
+      operationId: getCustomerQuote
+      summary: Get specific quote details
+      tags:
+        - Customer - Quotes
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Quote details with answers and uploads
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  quote:
+                    $ref: "#/components/schemas/Quote"
+                  answers:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/QuoteAnswer"
+                  uploads:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Upload"
+    patch:
+      operationId: updateCustomerQuote
+      summary: Update quote (before finalization)
+      tags:
+        - Customer - Quotes
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tier_id:
+                  type: string
+                  nullable: true
+                customer_notes:
+                  type: string
+                  nullable: true
+      responses:
+        "200":
+          description: Quote updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quote"
+    delete:
+      operationId: deleteCustomerQuote
+      summary: Delete quote (before finalization)
+      tags:
+        - Customer - Quotes
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Quote deleted successfully
+  /api/customer/quote-answers:
+    post:
+      operationId: createQuoteAnswers
+      summary: Submit configuration answers for quote
+      tags:
+        - Customer - Quotes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - quote_id
+                - answers
+              properties:
+                quote_id:
+                  type: string
+                answers:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - option_key
+                      - option_label
+                      - answer_value
+                    properties:
+                      option_key:
+                        type: string
+                      option_label:
+                        type: string
+                      answer_value:
+                        type: string
+      responses:
+        "201":
+          description: Answers submitted successfully
+  /api/customer/uploads:
+    post:
+      operationId: createCustomerUpload
+      summary: Upload file for quote or order
+      tags:
+        - Customer - Files
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - file_url
+                - file_name
+                - file_type
+                - file_size
+              properties:
+                quote_id:
+                  type: string
+                  nullable: true
+                order_id:
+                  type: string
+                  nullable: true
+                file_url:
+                  type: string
+                file_name:
+                  type: string
+                file_type:
+                  type: string
+                file_size:
+                  type: integer
+                dpi_warning:
+                  type: boolean
+      responses:
+        "201":
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Upload"
+  /api/customer/bookings:
+    get:
+      operationId: getCustomerBookings
+      summary: Get all bookings for current customer
+      tags:
+        - Customer - Bookings
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum:
+              - PENDING
+              - CONFIRMED
+              - COMPLETED
+              - CANCELLED
+              - RESCHEDULED
+        - name: is_emergency
+          in: query
+          schema:
+            type: boolean
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            enum:
+              - booking_date
+              - created_at
+            default: booking_date
+        - name: sort_order
+          in: query
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+      responses:
+        "200":
+          description: List of customer bookings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Booking"
+                  total:
+                    type: integer
+    post:
+      operationId: createCustomerBooking
+      summary: Create new booking for quote
+      tags:
+        - Customer - Bookings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - quote_id
+                - booking_date
+              properties:
+                quote_id:
+                  type: string
+                booking_date:
+                  type: string
+                  format: date
+                time_slot:
+                  type: string
+                  nullable: true
+                is_emergency:
+                  type: boolean
+      responses:
+        "201":
+          description: Booking created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+  /api/customer/bookings/{id}:
+    get:
+      operationId: getCustomerBooking
+      summary: Get specific booking details
+      tags:
+        - Customer - Bookings
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Booking details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+    patch:
+      operationId: updateCustomerBooking
+      summary: Reschedule booking
+      tags:
+        - Customer - Bookings
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                booking_date:
+                  type: string
+                  format: date
+                time_slot:
+                  type: string
+                  nullable: true
+      responses:
+        "200":
+          description: Booking updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+    delete:
+      operationId: cancelCustomerBooking
+      summary: Cancel booking
+      tags:
+        - Customer - Bookings
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Booking cancelled successfully
+  /api/customer/bookings/availability:
+    get:
+      operationId: getBookingAvailability
+      summary: Get calendar availability for booking dates
+      tags:
+        - Customer - Bookings
+      parameters:
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: service_id
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Calendar availability data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  dates:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                          format: date
+                        slots_available:
+                          type: integer
+                        slots_total:
+                          type: integer
+                        emergency_slots_available:
+                          type: integer
+                        is_blackout:
+                          type: boolean
+  /api/customer/orders:
+    get:
+      operationId: getCustomerOrders
+      summary: Get all orders for current customer
+      tags:
+        - Customer - Orders
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+        - name: service_id
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum:
+              - DEPOSIT_PAID
+              - DESIGN_IN_PROGRESS
+              - WAITING_APPROVAL
+              - IN_PRODUCTION
+              - QUALITY_CHECK
+              - READY_FOR_PICKUP
+              - SHIPPED
+              - COMPLETED
+              - CANCELLED
+        - name: tier_filter
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            enum:
+              - order_number
+              - created_at
+              - due_at
+              - priority
+            default: created_at
+        - name: sort_order
+          in: query
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: desc
+      responses:
+        "200":
+          description: List of customer orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Order"
+                  total:
+                    type: integer
+  /api/customer/orders/{id}:
+    get:
+      operationId: getCustomerOrder
+      summary: Get specific order details with timeline and proofs
+      tags:
+        - Customer - Orders
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Order details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order:
+                    $ref: "#/components/schemas/Order"
+                  proofs:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ProofVersion"
+                  uploads:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Upload"
+  /api/customer/orders/{id}/approve-proof:
+    post:
+      operationId: approveOrderProof
+      summary: Approve current proof version
+      tags:
+        - Customer - Orders
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - proof_version_id
+              properties:
+                proof_version_id:
+                  type: string
+      responses:
+        "200":
+          description: Proof approved successfully
+  /api/customer/orders/{id}/request-changes:
+    post:
+      operationId: requestProofChanges
+      summary: Request changes to current proof
+      tags:
+        - Customer - Orders
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - proof_version_id
+                - customer_comment
+              properties:
+                proof_version_id:
+                  type: string
+                customer_comment:
+                  type: string
+      responses:
+        "200":
+          description: Change request submitted successfully
+  /api/customer/messages/threads:
+    get:
+      operationId: getCustomerMessageThreads
+      summary: Get all message threads for current customer
+      tags:
+        - Customer - Messages
+      responses:
+        "200":
+          description: List of message threads
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MessageThread"
+  /api/customer/messages/threads/{id}:
+    get:
+      operationId: getCustomerMessageThread
+      summary: Get specific message thread with messages
+      tags:
+        - Customer - Messages
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Message thread with messages
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  thread:
+                    $ref: "#/components/schemas/MessageThread"
+                  messages:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Message"
+  /api/customer/messages:
+    post:
+      operationId: createCustomerMessage
+      summary: Send message in thread
+      tags:
+        - Customer - Messages
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - thread_id
+                - body
+              properties:
+                thread_id:
+                  type: string
+                body:
+                  type: string
+      responses:
+        "201":
+          description: Message sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+  /api/customer/messages/{id}/mark-read:
+    patch:
+      operationId: markCustomerMessageRead
+      summary: Mark message as read
+      tags:
+        - Customer - Messages
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Message marked as read
+  /api/customer/payments:
+    get:
+      operationId: getCustomerPayments
+      summary: Get all payments for current customer
+      tags:
+        - Customer - Payments
+      parameters:
+        - name: order_id
+          in: query
+          schema:
+            type: string
+        - name: method
+          in: query
+          schema:
+            type: string
+            enum:
+              - CREDIT_CARD
+              - BANK_TRANSFER
+              - CHECK
+              - CASH
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum:
+              - PENDING
+              - COMPLETED
+              - FAILED
+              - REFUNDED
+      responses:
+        "200":
+          description: List of customer payments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Payment"
+    post:
+      operationId: createCustomerPayment
+      summary: Submit payment for order
+      tags:
+        - Customer - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - order_id
+                - amount
+                - method
+              properties:
+                order_id:
+                  type: string
+                amount:
+                  type: number
+                method:
+                  type: string
+                  enum:
+                    - CREDIT_CARD
+                    - BANK_TRANSFER
+                    - CHECK
+                    - CASH
+                transaction_ref:
+                  type: string
+                  nullable: true
+      responses:
+        "201":
+          description: Payment submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+  /api/customer/invoices:
+    get:
+      operationId: getCustomerInvoices
+      summary: Get all invoices for current customer
+      tags:
+        - Customer - Payments
+      responses:
+        "200":
+          description: List of customer invoices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Invoice"
+  /api/customer/invoices/{id}:
+    get:
+      operationId: getCustomerInvoice
+      summary: Get specific invoice details
+      tags:
+        - Customer - Payments
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Invoice details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+  /api/customer/profile:
+    get:
+      operationId: getCustomerProfile
+      summary: Get current customer profile
+      tags:
+        - Customer - Profile
+      responses:
+        "200":
+          description: Customer profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    patch:
+      operationId: updateCustomerProfile
+      summary: Update customer profile
+      tags:
+        - Customer - Profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                phone:
+                  type: string
+                  nullable: true
+                company_name:
+                  type: string
+                  nullable: true
+                address:
+                  type: string
+                  nullable: true
+      responses:
+        "200":
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /api/customer/notifications:
+    get:
+      operationId: getCustomerNotifications
+      summary: Get all notifications for current customer
+      tags:
+        - Customer - Notifications
+      parameters:
+        - name: is_read
+          in: query
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: List of notifications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Notification"
+                  unread_count:
+                    type: integer
+  /api/customer/notifications/{id}/mark-read:
+    patch:
+      operationId: markCustomerNotificationRead
+      summary: Mark notification as read
+      tags:
+        - Customer - Notifications
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Notification marked as read
+  /api/staff/jobs:
+    get:
+      operationId: getStaffJobs
+      summary: Get job queue for staff
+      tags:
+        - Staff - Jobs
+      parameters:
+        - name: assignment_filter
+          in: query
+          schema:
+            type: string
+            enum:
+              - my_jobs
+              - all_jobs
+              - unassigned
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum:
+              - DEPOSIT_PAID
+              - DESIGN_IN_PROGRESS
+              - WAITING_APPROVAL
+              - IN_PRODUCTION
+              - QUALITY_CHECK
+              - READY_FOR_PICKUP
+              - SHIPPED
+              - COMPLETED
+              - CANCELLED
+        - name: priority
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 5
+        - name: due_date_filter
+          in: query
+          schema:
+            type: string
+            enum:
+              - today
+              - this_week
+              - overdue
+        - name: search_query
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            enum:
+              - priority
+              - due_at
+              - order_number
+            default: priority
+        - name: sort_order
+          in: query
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+      responses:
+        "200":
+          description: List of jobs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Order"
+                  total:
+                    type: integer
+  /api/staff/jobs/{id}:
+    get:
+      operationId: getStaffJob
+      summary: Get detailed job information
+      tags:
+        - Staff - Jobs
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Job details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order:
+                    $ref: "#/components/schemas/Order"
+                  checklist_items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/OrderChecklistItem"
+                  proofs:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ProofVersion"
+                  uploads:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Upload"
+  /api/staff/jobs/{id}/status:
+    patch:
+      operationId: updateStaffJobStatus
+      summary: Update job status
+      tags:
+        - Staff - Jobs
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - DEPOSIT_PAID
+                    - DESIGN_IN_PROGRESS
+                    - WAITING_APPROVAL
+                    - IN_PRODUCTION
+                    - QUALITY_CHECK
+                    - READY_FOR_PICKUP
+                    - SHIPPED
+                    - COMPLETED
+                    - CANCELLED
+                notes:
+                  type: string
+                  nullable: true
+      responses:
+        "200":
+          description: Status updated successfully
+  /api/staff/jobs/{id}/proofs:
+    post:
+      operationId: uploadStaffProof
+      summary: Upload proof for customer review
+      tags:
+        - Staff - Jobs
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - file_url
+                - version_number
+              properties:
+                version_number:
+                  type: integer
+                file_url:
+                  type: string
+                staff_message:
+                  type: string
+                  nullable: true
+      responses:
+        "201":
+          description: Proof uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProofVersion"
+  /api/staff/jobs/{id}/checklist:
+    get:
+      operationId: getStaffJobChecklist
+      summary: Get checklist items for job
+      tags:
+        - Staff - Jobs
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Checklist items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OrderChecklistItem"
+  /api/staff/jobs/{id}/checklist/{item_id}:
+    patch:
+      operationId: updateStaffChecklistItem
+      summary: Update checklist item completion
+      tags:
+        - Staff - Jobs
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: item_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                is_completed:
+                  type: boolean
+                notes:
+                  type: string
+                  nullable: true
+      responses:
+        "200":
+          description: Checklist item updated
+  /api/staff/calendar:
+    get:
+      operationId: getStaffCalendar
+      summary: Get staff calendar with bookings
+      tags:
+        - Staff - Calendar
+      parameters:
+        - name: view_mode
+          in: query
+          schema:
+            type: string
+            enum:
+              - month
+              - week
+              - agenda
+        - name: selected_date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: filter_assigned
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Calendar data with bookings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bookings:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Booking"
+  /api/staff/messages/threads:
+    get:
+      operationId: getStaffMessageThreads
+      summary: Get all message threads for staff
+      tags:
+        - Staff - Messages
+      parameters:
+        - name: filter_unread
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of message threads
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MessageThread"
+  /api/staff/messages/threads/{id}:
+    get:
+      operationId: getStaffMessageThread
+      summary: Get specific message thread with messages
+      tags:
+        - Staff - Messages
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Message thread with messages
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  thread:
+                    $ref: "#/components/schemas/MessageThread"
+                  messages:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Message"
+  /api/staff/messages:
+    post:
+      operationId: createStaffMessage
+      summary: Send message to customer
+      tags:
+        - Staff - Messages
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - thread_id
+                - body
+              properties:
+                thread_id:
+                  type: string
+                body:
+                  type: string
+      responses:
+        "201":
+          description: Message sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+  /api/staff/profile:
+    get:
+      operationId: getStaffProfile
+      summary: Get current staff profile with permissions
+      tags:
+        - Staff - Profile
+      responses:
+        "200":
+          description: Staff profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+                  permissions:
+                    $ref: "#/components/schemas/StaffPermissions"
+    patch:
+      operationId: updateStaffProfile
+      summary: Update staff profile
+      tags:
+        - Staff - Profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                phone:
+                  type: string
+                  nullable: true
+      responses:
+        "200":
+          description: Profile updated successfully
+  /api/admin/dashboard/metrics:
+    get:
+      operationId: getAdminDashboardMetrics
+      summary: Get admin dashboard metrics
+      tags:
+        - Admin - Dashboard
+      parameters:
+        - name: date_range
+          in: query
+          schema:
+            type: string
+            enum:
+              - last_7_days
+              - last_30_days
+              - last_90_days
+              - year_to_date
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Dashboard metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_revenue:
+                    type: number
+                  active_orders_count:
+                    type: integer
+                  pending_quotes_count:
+                    type: integer
+                  upcoming_bookings_count:
+                    type: integer
+                  pending_payments_count:
+                    type: integer
+                  low_stock_items_count:
+                    type: integer
+  /api/admin/services/categories:
+    get:
+      operationId: getAdminServiceCategories
+      summary: Get all service categories
+      tags:
+        - Admin - Services
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+        - name: is_active
+          in: query
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            enum:
+              - name
+              - sort_order
+              - created_at
+            default: sort_order
+        - name: sort_order
+          in: query
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+      responses:
+        "200":
+          description: List of service categories
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ServiceCategory"
+                  total:
+                    type: integer
+    post:
+      operationId: createAdminServiceCategory
+      summary: Create new service category
+      tags:
+        - Admin - Services
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - slug
+              properties:
+                name:
+                  type: string
+                slug:
+                  type: string
+                description:
+                  type: string
+                  nullable: true
+                sort_order:
+                  type: integer
+                is_active:
+                  type: boolean
+      responses:
+        "201":
+          description: Category created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceCategory"
+  /api/admin/services/categories/{id}:
+    get:
+      operationId: getAdminServiceCategory
+      summary: Get specific service category
+      tags:
+        - Admin - Services
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Category details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceCategory"
+    patch:
+      operationId: updateAdminServiceCategory
+      summary: Update service category
+      tags:
+        - Admin - Services
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                slug:
+                  type: string
+                description:
+                  type: string
+                  nullable: true
+                sort_order:
+                  type: integer
+                is_active:
+                  type: boolean
+      responses:
+        "200":
+          description: Category updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceCategory"
+    delete:
+      operationId: deleteAdminServiceCategory
+      summary: Delete service category
+      tags:
+        - Admin - Services
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Category deleted successfully
+  /api/admin/services:
+    get:
+      operationId: getAdminServices
+      summary: Get all services
+      tags:
+        - Admin - Services
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+        - name: category_id
+          in: query
+          schema:
+            type: string
+        - name: is_active
+          in: query
+          schema:
+            type: boolean
+        - name: is_top_seller
+          in: query
+          schema:
+            type: boolean
+        - name: requires_booking
+          in: query
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            enum:
+              - name
+              - base_price
+              - created_at
+            default: name
+        - name: sort_order
+          in: query
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+      responses:
+        "200":
+          description: List of services
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Service"
+                  total:
+                    type: integer
+    post:
+      operationId: createAdminService
+      summary: Create new service
+      tags:
+        - Admin - Services
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - category_id
+                - name
+                - slug
+                - description
+              properties:
+                category_id:
+                  type: string
+                name:
+                  type: string
+                slug:
+                  type: string
+                description:
+                  type: string
+                short_description:
+                  type: string
+                  nullable: true
+                requires_booking:
+                  type: boolean
+                requires_proof:
+                  type: boolean
+                is_top_seller:
+                  type: boolean
+                is_active:
+                  type: boolean
+                base_price:
+                  type: number
+                  nullable: true
+      responses:
+        "201":
+          description: Service created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+  /api/admin/services/{id}:
+    get:
+      operationId: getAdminService
+      summary: Get specific service with options
+      tags:
+        - Admin - Services
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Service details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  service:
+                    $ref: "#/components/schemas/Service"
+                  options:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ServiceOption"
+    patch:
+      operationId: updateAdminService
+      summary: Update service
+      tags:
+        - Admin - Services
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                category_id:
+                  type: string
+                name:
+                  type: string
+                slug:
+                  type: string
+                description:
+                  type: string
+                short_description:
+                  type: string
+                  nullable: true
+                requires_booking:
+                  type: boolean
+                requires_proof:
+                  type: boolean
+                is_top_seller:
+                  type: boolean
+                is_active:
+                  type: boolean
+                base_price:
+                  type: number
+                  nullable: true
+      responses:
+        "200":
+          description: Service updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+    delete:
+      operationId: deleteAdminService
+      summary: Delete service
+      tags:
+        - Admin - Services
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Service deleted successfully
+  /api/admin/services/{id}/duplicate:
+    post:
+      operationId: duplicateAdminService
+      summary: Duplicate service with all options
+      tags:
+        - Admin - Services
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - new_name
+                - new_slug
+              properties:
+                new_name:
+                  type: string
+                new_slug:
+                  type: string
+      responses:
+        "201":
+          description: Service duplicated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+  /api/admin/service-options:
+    get:
+      operationId: getAdminServiceOptions
+      summary: Get service options for specific service
+      tags:
+        - Admin - Services
+      parameters:
+        - name: service_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of service options
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ServiceOption"
+    post:
+      operationId: createAdminServiceOption
+      summary: Create new service option
+      tags:
+        - Admin - Services
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - service_id
+                - field_key
+                - label
+                - field_type
+              properties:
+                service_id:
+                  type: string
+                field_key:
+                  type: string
+                label:
+                  type: string
+                field_type:
+                  type: string
+                  enum:
+                    - text
+                    - number
+                    - select
+                    - radio
+                    - checkbox
+                    - textarea
+                is_required:
+                  type: boolean
+                help_text:
+                  type: string
+                  nullable: true
+                choices:
+                  type: string
+                  nullable: true
+                pricing_impact:
+                  type: string
+                  nullable: true
+                validation_rules:
+                  type: string
+                  nullable: true
+                sort_order:
+                  type: integer
+      responses:
+        "201":
+          description: Option created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceOption"
+  /api/admin/service-options/{id}:
+    patch:
+      operationId: updateAdminServiceOption
+      summary: Update service option
+      tags:
+        - Admin - Services
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                field_key:
+                  type: string
+                label:
+                  type: string
+                field_type:
+                  type: string
+                  enum:
+                    - text
+                    - number
+                    - select
+                    - radio
+                    - checkbox
+                    - textarea
+                is_required:
+                  type: boolean
+                help_text:
+                  type: string
+                  nullable: true
+                choices:
+                  type: string
+                  nullable: true
+                pricing_impact:
+                  type: string
+                  nullable: true
+                validation_rules:
+                  type: string
+                  nullable: true
+                sort_order:
+                  type: integer
+      responses:
+        "200":
+          description: Option updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceOption"
+    delete:
+      operationId: deleteAdminServiceOption
+      summary: Delete service option
+      tags:
+        - Admin - Services
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Option deleted successfully
+  /api/admin/tiers:
+    get:
+      operationId: getAdminTiers
+      summary: Get all tiers
+      tags:
+        - Admin - Tiers
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+        - name: is_active
+          in: query
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            enum:
+              - name
+              - sort_order
+              - price_multiplier
+            default: sort_order
+        - name: sort_order
+          in: query
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+      responses:
+        "200":
+          description: List of tiers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Tier"
+                  total:
+                    type: integer
+    post:
+      operationId: createAdminTier
+      summary: Create new tier
+      tags:
+        - Admin - Tiers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - slug
+                - description
+              properties:
+                name:
+                  type: string
+                slug:
+                  type: string
+                tagline:
+                  type: string
+                  nullable: true
+                description:
+                  type: string
+                is_active:
+                  type: boolean
+                turnaround_days_min:
+                  type: integer
+                  nullable: true
+                turnaround_days_max:
+                  type: integer
+                  nullable: true
+                revisions_allowed:
+                  type: integer
+                  nullable: true
+                rush_fee_percentage:
+                  type: number
+                  nullable: true
+                deposit_percentage:
+                  type: number
+                  nullable: true
+                price_multiplier:
+                  type: number
+                  nullable: true
+                sla_response_hours:
+                  type: integer
+                  nullable: true
+                sort_order:
+                  type: integer
+      responses:
+        "201":
+          description: Tier created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tier"
+  /api/admin/tiers/{id}:
+    get:
+      operationId: getAdminTier
+      summary: Get specific tier with features
+      tags:
+        - Admin - Tiers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Tier details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tier:
+                    $ref: "#/components/schemas/Tier"
+                  features:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/TierFeature"
+                  deliverables:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/TierDeliverable"
+    patch:
+      operationId: updateAdminTier
+      summary: Update tier
+      tags:
+        - Admin - Tiers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                slug:
+                  type: string
+                tagline:
+                  type: string
+                  nullable: true
+                description:
+                  type: string
+                is_active:
+                  type: boolean
+                turnaround_days_min:
+                  type: integer
+                  nullable: true
+                turnaround_days_max:
+                  type: integer
+                  nullable: true
+                revisions_allowed:
+                  type: integer
+                  nullable: true
+                rush_fee_percentage:
+                  type: number
+                  nullable: true
+                deposit_percentage:
+                  type: number
+                  nullable: true
+                price_multiplier:
+                  type: number
+                  nullable: true
+                sla_response_hours:
+                  type: integer
+                  nullable: true
+                sort_order:
+                  type: integer
+      responses:
+        "200":
+          description: Tier updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tier"
+  /api/admin/tier-features:
+    get:
+      operationId: getAdminTierFeatures
+      summary: Get tier features for specific tier
+      tags:
+        - Admin - Tiers
+      parameters:
+        - name: tier_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of tier features
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TierFeature"
+    post:
+      operationId: createAdminTierFeature
+      summary: Create new tier feature
+      tags:
+        - Admin - Tiers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tier_id
+                - group_name
+                - feature_key
+                - feature_label
+                - feature_value
+              properties:
+                tier_id:
+                  type: string
+                group_name:
+                  type: string
+                feature_key:
+                  type: string
+                feature_label:
+                  type: string
+                feature_value:
+                  type: string
+                is_included:
+                  type: boolean
+                sort_order:
+                  type: integer
+      responses:
+        "201":
+          description: Feature created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TierFeature"
+  /api/admin/tier-features/{id}:
+    patch:
+      operationId: updateAdminTierFeature
+      summary: Update tier feature
+      tags:
+        - Admin - Tiers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                group_name:
+                  type: string
+                feature_key:
+                  type: string
+                feature_label:
+                  type: string
+                feature_value:
+                  type: string
+                is_included:
+                  type: boolean
+                sort_order:
+                  type: integer
+      responses:
+        "200":
+          description: Feature updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TierFeature"
+    delete:
+      operationId: deleteAdminTierFeature
+      summary: Delete tier feature
+      tags:
+        - Admin - Tiers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Feature deleted successfully
+  /api/admin/tier-deliverables:
+    get:
+      operationId: getAdminTierDeliverables
+      summary: Get tier deliverables for specific tier
+      tags:
+        - Admin - Tiers
+      parameters:
+        - name: tier_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of tier deliverables
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TierDeliverable"
+    post:
+      operationId: createAdminTierDeliverable
+      summary: Create new tier deliverable
+      tags:
+        - Admin - Tiers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tier_id
+                - description
+              properties:
+                tier_id:
+                  type: string
+                description:
+                  type: string
+                service_category_filter:
+                  type: string
+                  nullable: true
+                sort_order:
+                  type: integer
+      responses:
+        "201":
+          description: Deliverable created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TierDeliverable"
+  /api/admin/tier-deliverables/{id}:
+    patch:
+      operationId: updateAdminTierDeliverable
+      summary: Update tier deliverable
+      tags:
+        - Admin - Tiers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                service_category_filter:
+                  type: string
+                  nullable: true
+                sort_order:
+                  type: integer
+      responses:
+        "200":
+          description: Deliverable updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TierDeliverable"
+    delete:
+      operationId: deleteAdminTierDeliverable
+      summary: Delete tier deliverable
+      tags:
+        - Admin - Tiers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deliverable deleted successfully
+  /api/admin/quotes:
+    get:
+      operationId: getAdminQuotes
+      summary: Get all quotes for admin management
+      tags:
+        - Admin - Quotes
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+        - name: customer_id
+          in: query
+          schema:
+            type: string
+        - name: service_id
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum:
+              - QUOTE_REQUESTED
+              - UNDER_REVIEW
+              - PENDING_APPROVAL
+              - FINALIZED
+              - REJECTED
+              - EXPIRED
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            enum:
+              - quote_number
+              - created_at
+              - total_amount
+            default: created_at
+        - name: sort_order
+          in: query
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: desc
+      responses:
+        "200":
+          description: List of quotes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Quote"
+                  total:
+                    type: integer
+  /api/admin/quotes/{id}:
+    get:
+      operationId: getAdminQuote
+      summary: Get specific quote for admin review
+      tags:
+        - Admin - Quotes
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Quote details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  quote:
+                    $ref: "#/components/schemas/Quote"
+                  answers:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/QuoteAnswer"
+                  uploads:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Upload"
+    patch:
+      operationId: updateAdminQuote
+      summary: Update quote (admin override)
+      tags:
+        - Admin - Quotes
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tier_id:
+                  type: string
+                  nullable: true
+                status:
+                  type: string
+                  enum:
+                    - QUOTE_REQUESTED
+                    - UNDER_REVIEW
+                    - PENDING_APPROVAL
+                    - FINALIZED
+                    - REJECTED
+                    - EXPIRED
+                estimate_min:
+                  type: number
+                  nullable: true
+                estimate_max:
+                  type: number
+                  nullable: true
+                final_subtotal:
+                  type: number
+                  nullable: true
+                tax_rate:
+                  type: number
+                  nullable: true
+                tax_amount:
+                  type: number
+                  nullable: true
+                total_amount:
+                  type: number
+                  nullable: true
+                admin_notes:
+                  type: string
+                  nullable: true
+      responses:
+        "200":
+          description: Quote updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quote"
+    delete:
+      operationId: deleteAdminQuote
+      summary: Delete quote
+      tags:
+        - Admin - Quotes
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Quote deleted successfully
+  /api/admin/quotes/{id}/finalize:
+    post:
+      operationId: finalizeAdminQuote
+      summary: Finalize quote with final pricing
+      tags:
+        - Admin - Quotes
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - final_subtotal
+                - tax_rate
+              properties:
+                final_subtotal:
+                  type: number
+                tax_rate:
+                  type: number
+                admin_notes:
+                  type: string
+                  nullable: true
+      responses:
+        "200":
+          description: Quote finalized successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quote"
+  /api/admin/quotes/{id}/request-info:
+    post:
+      operationId: requestQuoteInfo
+      summary: Request additional information from customer
+      tags:
+        - Admin - Quotes
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - message
+              properties:
+                message:
+                  type: string
+      responses:
+        "200":
+          description: Information request sent
+  /api/admin/orders:
+    get:
+      operationId: getAdminOrders
+      summary: Get all orders for admin management
+      tags:
+        - Admin - Orders
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+        - name: customer_id
+          in: query
+          schema:
+            type: string
+        - name: service_id
+          in: query
+          schema:
+            type: string
+        - name: assigned_staff_id
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum:
+              - DEPOSIT_PAID
+              - DESIGN_IN_PROGRESS
+              - WAITING_APPROVAL
+              - IN_PRODUCTION
+              - QUALITY_CHECK
+              - READY_FOR_PICKUP
+              - SHIPPED
+              - COMPLETED
+              - CANCELLED
+        - name: priority
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 5
+        - name: sla_breached
+          in: query
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            enum:
+              - order_number
+              - created_at
+              - due_at
+              - priority
+            default: created_at
+        - name: sort_order
+          in: query
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: desc
+      responses:
+        "200":
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Order"
+                  total:
+                    type: integer
+  /api/admin/orders/{id}:
+    get:
+      operationId: getAdminOrder
+      summary: Get specific order for admin management
+      tags:
+        - Admin - Orders
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Order details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order:
+                    $ref: "#/components/schemas/Order"
+                  checklist_items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/OrderChecklistItem"
+                  proofs:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ProofVersion"
+                  uploads:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Upload"
+    patch:
+      operationId: updateAdminOrder
+      summary: Update order (admin override)
+      tags:
+        - Admin - Orders
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assigned_staff_id:
+                  type: string
+                  nullable: true
+                status:
+                  type: string
+                  enum:
+                    - DEPOSIT_PAID
+                    - DESIGN_IN_PROGRESS
+                    - WAITING_APPROVAL
+                    - IN_PRODUCTION
+                    - QUALITY_CHECK
+                    - READY_FOR_PICKUP
+                    - SHIPPED
+                    - COMPLETED
+                    - CANCELLED
+                revisions_used:
+                  type: integer
+                priority:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                sla_breached:
+                  type: boolean
+      responses:
+        "200":
+          description: Order updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+  /api/admin/orders/{id}/assign-staff:
+    post:
+      operationId: assignOrderStaff
+      summary: Assign staff member to order
+      tags:
+        - Admin - Orders
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - staff_id
+              properties:
+                staff_id:
+                  type: string
+      responses:
+        "200":
+          description: Staff assigned successfully
+  /api/admin/orders/{id}/cancel:
+    post:
+      operationId: cancelAdminOrder
+      summary: Cancel order with reason
+      tags:
+        - Admin - Orders
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reason
+              properties:
+                reason:
+                  type: string
+                issue_refund:
+                  type: boolean
+                refund_amount:
+                  type: number
+                  nullable: true
+      responses:
+        "200":
+          description: Order cancelled successfully
+  /api/admin/users:
+    get:
+      operationId: getAdminUsers
+      summary: Get all users for admin management
+      tags:
+        - Admin - Users
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+        - name: role
+          in: query
+          schema:
+            type: string
+            enum:
+              - CUSTOMER
+              - STAFF
+              - ADMIN
+        - name: active
+          in: query
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            enum:
+              - name
+              - email
+              - created_at
+            default: created_at
+        - name: sort_order
+          in: query
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: desc
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/User"
+                  total:
+                    type: integer
+    post:
+      operationId: createAdminUser
+      summary: Create new user
+      tags:
+        - Admin - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - name
+                - role
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                name:
+                  type: string
+                role:
+                  type: string
+                  enum:
+                    - CUSTOMER
+                    - STAFF
+                    - ADMIN
+                phone:
+                  type: string
+                  nullable: true
+                company_name:
+                  type: string
+                  nullable: true
+                active:
+                  type: boolean
+      responses:
+        "201":
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /api/admin/users/{id}:
+    get:
+      operationId: getAdminUser
+      summary: Get specific user details
+      tags:
+        - Admin - Users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    patch:
+      operationId: updateAdminUser
+      summary: Update user
+      tags:
+        - Admin - Users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                name:
+                  type: string
+                role:
+                  type: string
+                  enum:
+                    - CUSTOMER
+                    - STAFF
+                    - ADMIN
+                phone:
+                  type: string
+                  nullable: true
+                company_name:
+                  type: string
+                  nullable: true
+                address:
+                  type: string
+                  nullable: true
+                active:
+                  type: boolean
+      responses:
+        "200":
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    delete:
+      operationId: deleteAdminUser
+      summary: Delete user (soft delete)
+      tags:
+        - Admin - Users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: User deleted successfully
+  /api/admin/staff-permissions/{user_id}:
+    get:
+      operationId: getAdminStaffPermissions
+      summary: Get staff permissions for user
+      tags:
+        - Admin - Users
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Staff permissions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StaffPermissions"
+    patch:
+      operationId: updateAdminStaffPermissions
+      summary: Update staff permissions
+      tags:
+        - Admin - Users
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                can_view_all_jobs:
+                  type: boolean
+                can_finalize_quotes:
+                  type: boolean
+                can_manage_calendar:
+                  type: boolean
+                can_access_inventory:
+                  type: boolean
+                can_upload_proofs:
+                  type: boolean
+                can_update_order_status:
+                  type: boolean
+                department:
+                  type: string
+                  nullable: true
+      responses:
+        "200":
+          description: Permissions updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StaffPermissions"
+  /api/admin/calendar/capacity-settings:
+    get:
+      operationId: getAdminCapacitySettings
+      summary: Get all capacity settings by day
+      tags:
+        - Admin - Calendar
+      responses:
+        "200":
+          description: List of capacity settings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CapacitySetting"
+  /api/admin/calendar/capacity-settings/{id}:
+    patch:
+      operationId: updateAdminCapacitySetting
+      summary: Update capacity setting for specific day
+      tags:
+        - Admin - Calendar
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                is_working_day:
+                  type: boolean
+                start_time:
+                  type: string
+                  nullable: true
+                end_time:
+                  type: string
+                  nullable: true
+                default_slots:
+                  type: integer
+                emergency_slots_max:
+                  type: integer
+                emergency_fee_percentage:
+                  type: number
+      responses:
+        "200":
+          description: Capacity setting updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CapacitySetting"
+  /api/admin/calendar/capacity-overrides:
+    get:
+      operationId: getAdminCapacityOverrides
+      summary: Get all capacity overrides
+      tags:
+        - Admin - Calendar
+      responses:
+        "200":
+          description: List of capacity overrides
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CapacityOverride"
+    post:
+      operationId: createAdminCapacityOverride
+      summary: Create capacity override for specific date
+      tags:
+        - Admin - Calendar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - override_date
+                - slots_available
+              properties:
+                override_date:
+                  type: string
+                  format: date
+                slots_available:
+                  type: integer
+                reason:
+                  type: string
+                  nullable: true
+      responses:
+        "201":
+          description: Override created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CapacityOverride"
+  /api/admin/calendar/capacity-overrides/{id}:
+    delete:
+      operationId: deleteAdminCapacityOverride
+      summary: Delete capacity override
+      tags:
+        - Admin - Calendar
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Override deleted successfully
+  /api/admin/calendar/blackout-dates:
+    get:
+      operationId: getAdminBlackoutDates
+      summary: Get all blackout dates
+      tags:
+        - Admin - Calendar
+      responses:
+        "200":
+          description: List of blackout dates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BlackoutDate"
+    post:
+      operationId: createAdminBlackoutDate
+      summary: Create blackout date range
+      tags:
+        - Admin - Calendar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - start_date
+                - end_date
+              properties:
+                start_date:
+                  type: string
+                  format: date
+                end_date:
+                  type: string
+                  format: date
+                reason:
+                  type: string
+                  nullable: true
+      responses:
+        "201":
+          description: Blackout date created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BlackoutDate"
+  /api/admin/calendar/blackout-dates/{id}:
+    delete:
+      operationId: deleteAdminBlackoutDate
+      summary: Delete blackout date
+      tags:
+        - Admin - Calendar
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Blackout date deleted successfully
+  /api/admin/payments:
+    get:
+      operationId: getAdminPayments
+      summary: Get all payments for admin management
+      tags:
+        - Admin - Payments
+      parameters:
+        - name: order_id
+          in: query
+          schema:
+            type: string
+        - name: method
+          in: query
+          schema:
+            type: string
+            enum:
+              - CREDIT_CARD
+              - BANK_TRANSFER
+              - CHECK
+              - CASH
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum:
+              - PENDING
+              - COMPLETED
+              - FAILED
+              - REFUNDED
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            enum:
+              - payment_number
+              - payment_date
+              - amount
+            default: payment_date
+        - name: sort_order
+          in: query
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: desc
+      responses:
+        "200":
+          description: List of payments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Payment"
+                  total:
+                    type: integer
+  /api/admin/payments/{id}:
+    get:
+      operationId: getAdminPayment
+      summary: Get specific payment details
+      tags:
+        - Admin - Payments
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Payment details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+    patch:
+      operationId: updateAdminPayment
+      summary: Update payment
+      tags:
+        - Admin - Payments
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - PENDING
+                    - COMPLETED
+                    - FAILED
+                    - REFUNDED
+                receipt_url:
+                  type: string
+                  nullable: true
+      responses:
+        "200":
+          description: Payment updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+  /api/admin/payments/{id}/verify:
+    post:
+      operationId: verifyAdminPayment
+      summary: Verify manual payment
+      tags:
+        - Admin - Payments
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Payment verified successfully
+  /api/admin/payments/{id}/refund:
+    post:
+      operationId: refundAdminPayment
+      summary: Issue refund for payment
+      tags:
+        - Admin - Payments
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refund_amount
+                - refund_reason
+              properties:
+                refund_amount:
+                  type: number
+                refund_reason:
+                  type: string
+      responses:
+        "200":
+          description: Refund processed successfully
+  /api/admin/gallery:
+    get:
+      operationId: getAdminGalleryItems
+      summary: Get all gallery items for admin
+      tags:
+        - Admin - Content
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+        - name: service_category_id
+          in: query
+          schema:
+            type: string
+        - name: service_id
+          in: query
+          schema:
+            type: string
+        - name: is_featured
+          in: query
+          schema:
+            type: boolean
+        - name: is_visible
+          in: query
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: List of gallery items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/GalleryItem"
+                  total:
+                    type: integer
+    post:
+      operationId: createAdminGalleryItem
+      summary: Create new gallery item
+      tags:
+        - Admin - Content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - slug
+                - description
+              properties:
+                title:
+                  type: string
+                slug:
+                  type: string
+                description:
+                  type: string
+                service_category_id:
+                  type: string
+                  nullable: true
+                service_id:
+                  type: string
+                  nullable: true
+                tier_used:
+                  type: string
+                  nullable: true
+                client_name:
+                  type: string
+                  nullable: true
+                client_approved_display:
+                  type: boolean
+                testimonial_quote:
+                  type: string
+                  nullable: true
+                timeline_description:
+                  type: string
+                  nullable: true
+                is_featured:
+                  type: boolean
+                is_visible:
+                  type: boolean
+                sort_order:
+                  type: integer
+      responses:
+        "201":
+          description: Gallery item created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GalleryItem"
+  /api/admin/gallery/{id}:
+    get:
+      operationId: getAdminGalleryItem
+      summary: Get specific gallery item
+      tags:
+        - Admin - Content
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Gallery item details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  item:
+                    $ref: "#/components/schemas/GalleryItem"
+                  images:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/GalleryImage"
+    patch:
+      operationId: updateAdminGalleryItem
+      summary: Update gallery item
+      tags:
+        - Admin - Content
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                slug:
+                  type: string
+                description:
+                  type: string
+                is_featured:
+                  type: boolean
+                is_visible:
+                  type: boolean
+                sort_order:
+                  type: integer
+      responses:
+        "200":
+          description: Gallery item updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GalleryItem"
+    delete:
+      operationId: deleteAdminGalleryItem
+      summary: Delete gallery item
+      tags:
+        - Admin - Content
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Gallery item deleted successfully
+  /api/admin/gallery-images:
+    post:
+      operationId: createAdminGalleryImage
+      summary: Add image to gallery item
+      tags:
+        - Admin - Content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - gallery_item_id
+                - image_url
+              properties:
+                gallery_item_id:
+                  type: string
+                image_url:
+                  type: string
+                caption:
+                  type: string
+                  nullable: true
+                is_primary:
+                  type: boolean
+                sort_order:
+                  type: integer
+      responses:
+        "201":
+          description: Image added successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GalleryImage"
+  /api/admin/gallery-images/{id}:
+    patch:
+      operationId: updateAdminGalleryImage
+      summary: Update gallery image
+      tags:
+        - Admin - Content
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                caption:
+                  type: string
+                  nullable: true
+                is_primary:
+                  type: boolean
+                sort_order:
+                  type: integer
+      responses:
+        "200":
+          description: Image updated successfully
+    delete:
+      operationId: deleteAdminGalleryImage
+      summary: Delete gallery image
+      tags:
+        - Admin - Content
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Image deleted successfully
+  /api/admin/content-sections:
+    get:
+      operationId: getAdminContentSections
+      summary: Get all content sections
+      tags:
+        - Admin - Content
+      responses:
+        "200":
+          description: List of content sections
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContentSection"
+  /api/admin/content-sections/{id}:
+    patch:
+      operationId: updateAdminContentSection
+      summary: Update content section
+      tags:
+        - Admin - Content
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+      responses:
+        "200":
+          description: Content section updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContentSection"
+  /api/admin/team-members:
+    get:
+      operationId: getAdminTeamMembers
+      summary: Get all team members
+      tags:
+        - Admin - Content
+      responses:
+        "200":
+          description: List of team members
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TeamMember"
+    post:
+      operationId: createAdminTeamMember
+      summary: Create new team member
+      tags:
+        - Admin - Content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - role
+                - bio
+              properties:
+                name:
+                  type: string
+                role:
+                  type: string
+                photo_url:
+                  type: string
+                  nullable: true
+                bio:
+                  type: string
+                sort_order:
+                  type: integer
+                is_visible:
+                  type: boolean
+      responses:
+        "201":
+          description: Team member created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamMember"
+  /api/admin/team-members/{id}:
+    patch:
+      operationId: updateAdminTeamMember
+      summary: Update team member
+      tags:
+        - Admin - Content
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                role:
+                  type: string
+                photo_url:
+                  type: string
+                  nullable: true
+                bio:
+                  type: string
+                sort_order:
+                  type: integer
+                is_visible:
+                  type: boolean
+      responses:
+        "200":
+          description: Team member updated successfully
+    delete:
+      operationId: deleteAdminTeamMember
+      summary: Delete team member
+      tags:
+        - Admin - Content
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Team member deleted successfully
+  /api/admin/faqs:
+    get:
+      operationId: getAdminFAQs
+      summary: Get all FAQs for admin management
+      tags:
+        - Admin - Content
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: is_active
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of FAQs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FAQ"
+    post:
+      operationId: createAdminFAQ
+      summary: Create new FAQ
+      tags:
+        - Admin - Content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - question
+                - answer
+                - category
+              properties:
+                question:
+                  type: string
+                answer:
+                  type: string
+                category:
+                  type: string
+                is_active:
+                  type: boolean
+                sort_order:
+                  type: integer
+      responses:
+        "201":
+          description: FAQ created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FAQ"
+  /api/admin/faqs/{id}:
+    patch:
+      operationId: updateAdminFAQ
+      summary: Update FAQ
+      tags:
+        - Admin - Content
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                question:
+                  type: string
+                answer:
+                  type: string
+                category:
+                  type: string
+                is_active:
+                  type: boolean
+                sort_order:
+                  type: integer
+      responses:
+        "200":
+          description: FAQ updated successfully
+    delete:
+      operationId: deleteAdminFAQ
+      summary: Delete FAQ
+      tags:
+        - Admin - Content
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: FAQ deleted successfully
+  /api/admin/contact-inquiries:
+    get:
+      operationId: getAdminContactInquiries
+      summary: Get all contact inquiries
+      tags:
+        - Admin - Content
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum:
+              - NEW
+              - REPLIED
+              - RESOLVED
+              - SPAM
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: List of contact inquiries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ContactInquiry"
+                  total:
+                    type: integer
+  /api/admin/contact-inquiries/{id}:
+    patch:
+      operationId: updateAdminContactInquiry
+      summary: Update contact inquiry status
+      tags:
+        - Admin - Content
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - NEW
+                    - REPLIED
+                    - RESOLVED
+                    - SPAM
+      responses:
+        "200":
+          description: Inquiry status updated
+  /api/admin/materials:
+    get:
+      operationId: getAdminMaterials
+      summary: Get all materials
+      tags:
+        - Admin - Pricing
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: is_active
+          in: query
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: List of materials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Material"
+                  total:
+                    type: integer
+    post:
+      operationId: createAdminMaterial
+      summary: Create new material
+      tags:
+        - Admin - Pricing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - sku
+                - name
+                - category
+                - unit
+                - cost_per_unit
+              properties:
+                sku:
+                  type: string
+                name:
+                  type: string
+                category:
+                  type: string
+                unit:
+                  type: string
+                cost_per_unit:
+                  type: number
+                supplier_name:
+                  type: string
+                  nullable: true
+                notes:
+                  type: string
+                  nullable: true
+                is_active:
+                  type: boolean
+      responses:
+        "201":
+          description: Material created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Material"
+  /api/admin/materials/{id}:
+    patch:
+      operationId: updateAdminMaterial
+      summary: Update material
+      tags:
+        - Admin - Pricing
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                cost_per_unit:
+                  type: number
+                supplier_name:
+                  type: string
+                  nullable: true
+                notes:
+                  type: string
+                  nullable: true
+                is_active:
+                  type: boolean
+      responses:
+        "200":
+          description: Material updated successfully
+  /api/admin/app-settings:
+    get:
+      operationId: getAdminAppSettings
+      summary: Get all app settings
+      tags:
+        - Admin - Settings
+      responses:
+        "200":
+          description: List of app settings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AppSetting"
+  /api/admin/app-settings/{id}:
+    patch:
+      operationId: updateAdminAppSetting
+      summary: Update app setting
+      tags:
+        - Admin - Settings
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - setting_value
+              properties:
+                setting_value:
+                  type: string
+      responses:
+        "200":
+          description: Setting updated successfully
+  /api/admin/feature-flags:
+    get:
+      operationId: getAdminFeatureFlags
+      summary: Get all feature flags
+      tags:
+        - Admin - Settings
+      responses:
+        "200":
+          description: List of feature flags
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FeatureFlag"
+  /api/admin/feature-flags/{id}:
+    patch:
+      operationId: updateAdminFeatureFlag
+      summary: Toggle feature flag
+      tags:
+        - Admin - Settings
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                is_enabled:
+                  type: boolean
+      responses:
+        "200":
+          description: Feature flag updated
+  /api/admin/audit-logs:
+    get:
+      operationId: getAdminAuditLogs
+      summary: Get audit logs
+      tags:
+        - Admin - Settings
+      parameters:
+        - name: user_id
+          in: query
+          schema:
+            type: string
+        - name: action
+          in: query
+          schema:
+            type: string
+        - name: target_type
+          in: query
+          schema:
+            type: string
+        - name: target_id
+          in: query
+          schema:
+            type: string
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: List of audit logs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AuditLog"
+                  total:
+                    type: integer
+  /api/admin/b2b-accounts:
+    get:
+      operationId: getAdminB2BAccounts
+      summary: Get all B2B accounts
+      tags:
+        - Admin - B2B
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum:
+              - ACTIVE
+              - SUSPENDED
+              - EXPIRED
+      responses:
+        "200":
+          description: List of B2B accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/B2BAccount"
+    post:
+      operationId: createAdminB2BAccount
+      summary: Create new B2B account
+      tags:
+        - Admin - B2B
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - company_name
+                - main_contact_id
+                - contract_start_date
+                - contract_end_date
+              properties:
+                company_name:
+                  type: string
+                main_contact_id:
+                  type: string
+                account_manager_id:
+                  type: string
+                  nullable: true
+                contract_start_date:
+                  type: string
+                  format: date
+                contract_end_date:
+                  type: string
+                  format: date
+                contract_terms:
+                  type: string
+                  nullable: true
+                consolidated_invoicing:
+                  type: boolean
+      responses:
+        "201":
+          description: B2B account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/B2BAccount"
+  /api/admin/b2b-accounts/{id}:
+    get:
+      operationId: getAdminB2BAccount
+      summary: Get specific B2B account
+      tags:
+        - Admin - B2B
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: B2B account details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/B2BAccount"
+    patch:
+      operationId: updateAdminB2BAccount
+      summary: Update B2B account
+      tags:
+        - Admin - B2B
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                company_name:
+                  type: string
+                account_manager_id:
+                  type: string
+                  nullable: true
+                contract_end_date:
+                  type: string
+                  format: date
+                status:
+                  type: string
+                  enum:
+                    - ACTIVE
+                    - SUSPENDED
+                    - EXPIRED
+                consolidated_invoicing:
+                  type: boolean
+      responses:
+        "200":
+          description: B2B account updated successfully
+  /api/admin/b2b-locations:
+    get:
+      operationId: getAdminB2BLocations
+      summary: Get B2B locations for account
+      tags:
+        - Admin - B2B
+      parameters:
+        - name: account_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of B2B locations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/B2BLocation"
+    post:
+      operationId: createAdminB2BLocation
+      summary: Create new B2B location
+      tags:
+        - Admin - B2B
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - account_id
+                - location_name
+                - address
+              properties:
+                account_id:
+                  type: string
+                location_name:
+                  type: string
+                address:
+                  type: string
+                contact_person:
+                  type: string
+                  nullable: true
+                contact_phone:
+                  type: string
+                  nullable: true
+                contact_email:
+                  type: string
+                  nullable: true
+      responses:
+        "201":
+          description: Location created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/B2BLocation"
+  /api/admin/b2b-locations/{id}:
+    patch:
+      operationId: updateAdminB2BLocation
+      summary: Update B2B location
+      tags:
+        - Admin - B2B
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                location_name:
+                  type: string
+                address:
+                  type: string
+                contact_person:
+                  type: string
+                  nullable: true
+                contact_phone:
+                  type: string
+                  nullable: true
+                contact_email:
+                  type: string
+                  nullable: true
+      responses:
+        "200":
+          description: Location updated successfully
+    delete:
+      operationId: deleteAdminB2BLocation
+      summary: Delete B2B location
+      tags:
+        - Admin - B2B
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Location deleted successfully
+  /api/admin/contract-pricing:
+    get:
+      operationId: getAdminContractPricing
+      summary: Get contract pricing for B2B account
+      tags:
+        - Admin - B2B
+      parameters:
+        - name: account_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of contract pricing
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContractPricing"
+    post:
+      operationId: createAdminContractPricing
+      summary: Create contract pricing rule
+      tags:
+        - Admin - B2B
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - account_id
+                - service_id
+                - tier_id
+              properties:
+                account_id:
+                  type: string
+                service_id:
+                  type: string
+                tier_id:
+                  type: string
+                contract_price:
+                  type: number
+                  nullable: true
+                discount_percentage:
+                  type: number
+                  nullable: true
+                effective_date:
+                  type: string
+                  format: date
+                  nullable: true
+                expiry_date:
+                  type: string
+                  format: date
+                  nullable: true
+      responses:
+        "201":
+          description: Contract pricing created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContractPricing"
+  /api/admin/contract-pricing/{id}:
+    patch:
+      operationId: updateAdminContractPricing
+      summary: Update contract pricing
+      tags:
+        - Admin - B2B
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                contract_price:
+                  type: number
+                  nullable: true
+                discount_percentage:
+                  type: number
+                  nullable: true
+                expiry_date:
+                  type: string
+                  format: date
+                  nullable: true
+      responses:
+        "200":
+          description: Contract pricing updated successfully
+    delete:
+      operationId: deleteAdminContractPricing
+      summary: Delete contract pricing
+      tags:
+        - Admin - B2B
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Contract pricing deleted successfully
+  /api/admin/inventory-items:
+    get:
+      operationId: getAdminInventoryItems
+      summary: Get all inventory items
+      tags:
+        - Admin - Inventory
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: is_active
+          in: query
+          schema:
+            type: boolean
+        - name: low_stock
+          in: query
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: List of inventory items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/InventoryItem"
+                  total:
+                    type: integer
+    post:
+      operationId: createAdminInventoryItem
+      summary: Create new inventory item
+      tags:
+        - Admin - Inventory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - sku
+                - name
+                - category
+                - unit
+                - reorder_point
+                - reorder_qty
+                - cost_per_unit
+              properties:
+                sku:
+                  type: string
+                name:
+                  type: string
+                category:
+                  type: string
+                unit:
+                  type: string
+                qty_on_hand:
+                  type: integer
+                reorder_point:
+                  type: integer
+                reorder_qty:
+                  type: integer
+                supplier_name:
+                  type: string
+                  nullable: true
+                cost_per_unit:
+                  type: number
+                notes:
+                  type: string
+                  nullable: true
+                is_active:
+                  type: boolean
+      responses:
+        "201":
+          description: Inventory item created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InventoryItem"
+  /api/admin/inventory-items/{id}:
+    patch:
+      operationId: updateAdminInventoryItem
+      summary: Update inventory item
+      tags:
+        - Admin - Inventory
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                qty_on_hand:
+                  type: integer
+                reorder_point:
+                  type: integer
+                reorder_qty:
+                  type: integer
+                supplier_name:
+                  type: string
+                  nullable: true
+                cost_per_unit:
+                  type: number
+                notes:
+                  type: string
+                  nullable: true
+                is_active:
+                  type: boolean
+      responses:
+        "200":
+          description: Inventory item updated successfully
+  /api/admin/material-consumption-rules:
+    get:
+      operationId: getAdminMaterialConsumptionRules
+      summary: Get material consumption rules for service
+      tags:
+        - Admin - Inventory
+      parameters:
+        - name: service_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of consumption rules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MaterialConsumptionRule"
+    post:
+      operationId: createAdminMaterialConsumptionRule
+      summary: Create material consumption rule
+      tags:
+        - Admin - Inventory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - service_id
+                - inventory_item_id
+                - qty_per_unit
+              properties:
+                service_id:
+                  type: string
+                inventory_item_id:
+                  type: string
+                qty_per_unit:
+                  type: number
+                tier_filter:
+                  type: string
+                  nullable: true
+      responses:
+        "201":
+          description: Consumption rule created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MaterialConsumptionRule"
+  /api/admin/material-consumption-rules/{id}:
+    delete:
+      operationId: deleteAdminMaterialConsumptionRule
+      summary: Delete consumption rule
+      tags:
+        - Admin - Inventory
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Consumption rule deleted successfully
+  /api/admin/inventory-transactions:
+    get:
+      operationId: getAdminInventoryTransactions
+      summary: Get inventory transaction history
+      tags:
+        - Admin - Inventory
+      parameters:
+        - name: inventory_item_id
+          in: query
+          schema:
+            type: string
+        - name: transaction_type
+          in: query
+          schema:
+            type: string
+            enum:
+              - PURCHASE
+              - CONSUMPTION
+              - ADJUSTMENT
+              - RETURN
+        - name: order_id
+          in: query
+          schema:
+            type: string
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: List of inventory transactions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/InventoryTransaction"
+                  total:
+                    type: integer
+  /api/admin/purchase-orders:
+    get:
+      operationId: getAdminPurchaseOrders
+      summary: Get all purchase orders
+      tags:
+        - Admin - Inventory
+      parameters:
+        - name: supplier_name
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum:
+              - DRAFT
+              - SENT
+              - RECEIVED
+              - CANCELLED
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: List of purchase orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PurchaseOrder"
+                  total:
+                    type: integer
+    post:
+      operationId: createAdminPurchaseOrder
+      summary: Create new purchase order
+      tags:
+        - Admin - Inventory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - supplier_name
+                - total_cost
+              properties:
+                supplier_name:
+                  type: string
+                total_cost:
+                  type: number
+                notes:
+                  type: string
+                  nullable: true
+      responses:
+        "201":
+          description: Purchase order created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PurchaseOrder"
+  /api/admin/purchase-orders/{id}:
+    get:
+      operationId: getAdminPurchaseOrder
+      summary: Get specific purchase order with items
+      tags:
+        - Admin - Inventory
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Purchase order details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  purchase_order:
+                    $ref: "#/components/schemas/PurchaseOrder"
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PurchaseOrderItem"
+    patch:
+      operationId: updateAdminPurchaseOrder
+      summary: Update purchase order
+      tags:
+        - Admin - Inventory
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - DRAFT
+                    - SENT
+                    - RECEIVED
+                    - CANCELLED
+                total_cost:
+                  type: number
+                notes:
+                  type: string
+                  nullable: true
+      responses:
+        "200":
+          description: Purchase order updated successfully
+  /api/admin/purchase-orders/{id}/receive:
+    post:
+      operationId: receivePurchaseOrder
+      summary: Mark purchase order as received and update inventory
+      tags:
+        - Admin - Inventory
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Purchase order received successfully
+  /api/admin/analytics/overview:
+    get:
+      operationId: getAdminAnalyticsOverview
+      summary: Get analytics overview metrics
+      tags:
+        - Admin - Analytics
+      parameters:
+        - name: date_range
+          in: query
+          schema:
+            type: string
+            enum:
+              - last_7_days
+              - last_30_days
+              - last_90_days
+              - year_to_date
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Analytics overview
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_revenue:
+                    type: number
+                  total_orders:
+                    type: integer
+                  average_order_value:
+                    type: number
+                  conversion_rate:
+                    type: number
+  /api/admin/analytics/funnel:
+    get:
+      operationId: getAdminAnalyticsFunnel
+      summary: Get customer funnel analytics
+      tags:
+        - Admin - Analytics
+      parameters:
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Funnel analytics data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  quote_started:
+                    type: integer
+                  quote_submitted:
+                    type: integer
+                  quote_finalized:
+                    type: integer
+                  deposit_paid:
+                    type: integer
+                  completed:
+                    type: integer
+  /api/admin/analytics/revenue-by-tier:
+    get:
+      operationId: getAdminAnalyticsRevenueByTier
+      summary: Get revenue breakdown by tier
+      tags:
+        - Admin - Analytics
+      parameters:
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Revenue by tier
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    tier_name:
+                      type: string
+                    revenue:
+                      type: number
+                    percentage:
+                      type: number
+  /api/admin/analytics/revenue-by-service:
+    get:
+      operationId: getAdminAnalyticsRevenueByService
+      summary: Get revenue breakdown by service
+      tags:
+        - Admin - Analytics
+      parameters:
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Top services by revenue
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    service_name:
+                      type: string
+                    revenue:
+                      type: number
+                    order_count:
+                      type: integer
+  /api/admin/sla/timers:
+    get:
+      operationId: getAdminSLATimers
+      summary: Get active SLA timers
+      tags:
+        - Admin - SLA
+      parameters:
+        - name: is_breached
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of SLA timers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SLATimer"
+  /api/admin/sla/breaches:
+    get:
+      operationId: getAdminSLABreaches
+      summary: Get SLA breach history
+      tags:
+        - Admin - SLA
+      parameters:
+        - name: order_id
+          in: query
+          schema:
+            type: string
+        - name: breach_type
+          in: query
+          schema:
+            type: string
+            enum:
+              - PROOF_DELAY
+              - PRODUCTION_DELAY
+              - RESPONSE_DELAY
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: List of SLA breaches
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SLABreach"
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - email
+        - password_hash
+        - name
+        - role
+        - active
+        - email_verified
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        password_hash:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+          enum:
+            - CUSTOMER
+            - STAFF
+            - ADMIN
+        phone:
+          type: string
+          nullable: true
+        company_name:
+          type: string
+          nullable: true
+        address:
+          type: string
+          nullable: true
+        active:
+          type: boolean
+        email_verified:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    StaffPermissions:
+      type: object
+      required:
+        - id
+        - user_id
+        - can_view_all_jobs
+        - can_finalize_quotes
+        - can_manage_calendar
+        - can_access_inventory
+        - can_upload_proofs
+        - can_update_order_status
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        can_view_all_jobs:
+          type: boolean
+        can_finalize_quotes:
+          type: boolean
+        can_manage_calendar:
+          type: boolean
+        can_access_inventory:
+          type: boolean
+        can_upload_proofs:
+          type: boolean
+        can_update_order_status:
+          type: boolean
+        department:
+          type: string
+          nullable: true
+    ServiceCategory:
+      type: object
+      required:
+        - id
+        - name
+        - slug
+        - sort_order
+        - is_active
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+          nullable: true
+        sort_order:
+          type: integer
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Service:
+      type: object
+      required:
+        - id
+        - category_id
+        - name
+        - slug
+        - description
+        - requires_booking
+        - requires_proof
+        - is_top_seller
+        - is_active
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        category_id:
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        short_description:
+          type: string
+          nullable: true
+        requires_booking:
+          type: boolean
+        requires_proof:
+          type: boolean
+        is_top_seller:
+          type: boolean
+        is_active:
+          type: boolean
+        base_price:
+          type: number
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    ServiceOption:
+      type: object
+      required:
+        - id
+        - service_id
+        - field_key
+        - label
+        - field_type
+        - is_required
+        - sort_order
+      properties:
+        id:
+          type: string
+        service_id:
+          type: string
+        field_key:
+          type: string
+        label:
+          type: string
+        field_type:
+          type: string
+          enum:
+            - text
+            - number
+            - select
+            - radio
+            - checkbox
+            - textarea
+        is_required:
+          type: boolean
+        help_text:
+          type: string
+          nullable: true
+        choices:
+          type: string
+          nullable: true
+        pricing_impact:
+          type: string
+          nullable: true
+        validation_rules:
+          type: string
+          nullable: true
+        sort_order:
+          type: integer
+    Tier:
+      type: object
+      required:
+        - id
+        - name
+        - slug
+        - description
+        - is_active
+        - sort_order
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+        tagline:
+          type: string
+          nullable: true
+        description:
+          type: string
+        is_active:
+          type: boolean
+        turnaround_days_min:
+          type: integer
+          nullable: true
+        turnaround_days_max:
+          type: integer
+          nullable: true
+        revisions_allowed:
+          type: integer
+          nullable: true
+        rush_fee_percentage:
+          type: number
+          nullable: true
+        deposit_percentage:
+          type: number
+          nullable: true
+        price_multiplier:
+          type: number
+          nullable: true
+        sla_response_hours:
+          type: integer
+          nullable: true
+        sort_order:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    TierFeature:
+      type: object
+      required:
+        - id
+        - tier_id
+        - group_name
+        - feature_key
+        - feature_label
+        - feature_value
+        - is_included
+        - sort_order
+      properties:
+        id:
+          type: string
+        tier_id:
+          type: string
+        group_name:
+          type: string
+        feature_key:
+          type: string
+        feature_label:
+          type: string
+        feature_value:
+          type: string
+        is_included:
+          type: boolean
+        sort_order:
+          type: integer
+    TierDeliverable:
+      type: object
+      required:
+        - id
+        - tier_id
+        - description
+        - sort_order
+      properties:
+        id:
+          type: string
+        tier_id:
+          type: string
+        description:
+          type: string
+        service_category_filter:
+          type: string
+          nullable: true
+        sort_order:
+          type: integer
+    Quote:
+      type: object
+      required:
+        - id
+        - quote_number
+        - customer_id
+        - service_id
+        - status
+        - no_design_files
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        quote_number:
+          type: string
+        customer_id:
+          type: string
+        service_id:
+          type: string
+        tier_id:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum:
+            - QUOTE_REQUESTED
+            - UNDER_REVIEW
+            - PENDING_APPROVAL
+            - FINALIZED
+            - REJECTED
+            - EXPIRED
+        estimate_min:
+          type: number
+          nullable: true
+        estimate_max:
+          type: number
+          nullable: true
+        final_subtotal:
+          type: number
+          nullable: true
+        tax_rate:
+          type: number
+          nullable: true
+        tax_amount:
+          type: number
+          nullable: true
+        total_amount:
+          type: number
+          nullable: true
+        customer_notes:
+          type: string
+          nullable: true
+        admin_notes:
+          type: string
+          nullable: true
+        no_design_files:
+          type: boolean
+        finalized_at:
+          type: string
+          format: date-time
+          nullable: true
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    QuoteAnswer:
+      type: object
+      required:
+        - id
+        - quote_id
+        - option_key
+        - option_label
+        - answer_value
+      properties:
+        id:
+          type: string
+        quote_id:
+          type: string
+        option_key:
+          type: string
+        option_label:
+          type: string
+        answer_value:
+          type: string
+    Upload:
+      type: object
+      required:
+        - id
+        - user_id
+        - file_url
+        - file_name
+        - file_type
+        - file_size
+        - dpi_warning
+        - created_at
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        quote_id:
+          type: string
+          nullable: true
+        order_id:
+          type: string
+          nullable: true
+        file_url:
+          type: string
+        file_name:
+          type: string
+        file_type:
+          type: string
+        file_size:
+          type: integer
+        dpi_warning:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+    Booking:
+      type: object
+      required:
+        - id
+        - quote_id
+        - customer_id
+        - booking_date
+        - status
+        - is_emergency
+        - reschedule_count
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        quote_id:
+          type: string
+        customer_id:
+          type: string
+        booking_date:
+          type: string
+          format: date
+        time_slot:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum:
+            - PENDING
+            - CONFIRMED
+            - COMPLETED
+            - CANCELLED
+            - RESCHEDULED
+        is_emergency:
+          type: boolean
+        emergency_fee_percentage:
+          type: number
+          nullable: true
+        emergency_fee_amount:
+          type: number
+          nullable: true
+        reschedule_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Order:
+      type: object
+      required:
+        - id
+        - order_number
+        - quote_id
+        - customer_id
+        - service_id
+        - tier_id
+        - status
+        - subtotal
+        - emergency_fee
+        - rush_fee
+        - tax_rate
+        - tax_amount
+        - total_amount
+        - deposit_percentage
+        - deposit_amount
+        - balance_due
+        - revisions_used
+        - sla_breached
+        - priority
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        order_number:
+          type: string
+        quote_id:
+          type: string
+        customer_id:
+          type: string
+        service_id:
+          type: string
+        tier_id:
+          type: string
+        assigned_staff_id:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum:
+            - DEPOSIT_PAID
+            - DESIGN_IN_PROGRESS
+            - WAITING_APPROVAL
+            - IN_PRODUCTION
+            - QUALITY_CHECK
+            - READY_FOR_PICKUP
+            - SHIPPED
+            - COMPLETED
+            - CANCELLED
+        subtotal:
+          type: number
+        emergency_fee:
+          type: number
+        rush_fee:
+          type: number
+        tax_rate:
+          type: number
+        tax_amount:
+          type: number
+        total_amount:
+          type: number
+        deposit_percentage:
+          type: number
+        deposit_amount:
+          type: number
+        balance_due:
+          type: number
+        revisions_used:
+          type: integer
+        due_at:
+          type: string
+          format: date-time
+          nullable: true
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        sla_breached:
+          type: boolean
+        priority:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    OrderChecklistItem:
+      type: object
+      required:
+        - id
+        - order_id
+        - deliverable_id
+        - description
+        - is_completed
+        - sort_order
+      properties:
+        id:
+          type: string
+        order_id:
+          type: string
+        deliverable_id:
+          type: string
+        description:
+          type: string
+        is_completed:
+          type: boolean
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        completed_by_staff_id:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        sort_order:
+          type: integer
+    ProofVersion:
+      type: object
+      required:
+        - id
+        - order_id
+        - version_number
+        - file_url
+        - created_by_staff_id
+        - status
+        - created_at
+      properties:
+        id:
+          type: string
+        order_id:
+          type: string
+        version_number:
+          type: integer
+        file_url:
+          type: string
+        created_by_staff_id:
+          type: string
+        status:
+          type: string
+          enum:
+            - SENT
+            - VIEWED
+            - APPROVED
+            - REVISION_REQUESTED
+        staff_message:
+          type: string
+          nullable: true
+        customer_comment:
+          type: string
+          nullable: true
+        approved_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    MessageThread:
+      type: object
+      required:
+        - id
+        - customer_id
+        - created_at
+      properties:
+        id:
+          type: string
+        quote_id:
+          type: string
+          nullable: true
+        order_id:
+          type: string
+          nullable: true
+        customer_id:
+          type: string
+        last_message_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    Message:
+      type: object
+      required:
+        - id
+        - thread_id
+        - sender_id
+        - body
+        - is_read
+        - created_at
+      properties:
+        id:
+          type: string
+        thread_id:
+          type: string
+        sender_id:
+          type: string
+        body:
+          type: string
+        is_read:
+          type: boolean
+        read_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    Payment:
+      type: object
+      required:
+        - id
+        - payment_number
+        - order_id
+        - amount
+        - method
+        - status
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        payment_number:
+          type: string
+        order_id:
+          type: string
+        amount:
+          type: number
+        method:
+          type: string
+          enum:
+            - CREDIT_CARD
+            - BANK_TRANSFER
+            - CHECK
+            - CASH
+        status:
+          type: string
+          enum:
+            - PENDING
+            - COMPLETED
+            - FAILED
+            - REFUNDED
+        transaction_ref:
+          type: string
+          nullable: true
+        payment_date:
+          type: string
+          format: date-time
+          nullable: true
+        receipt_url:
+          type: string
+          nullable: true
+        verified_by_admin_id:
+          type: string
+          nullable: true
+        verified_at:
+          type: string
+          format: date-time
+          nullable: true
+        refund_amount:
+          type: number
+          nullable: true
+        refund_reason:
+          type: string
+          nullable: true
+        refunded_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Invoice:
+      type: object
+      required:
+        - id
+        - invoice_number
+        - order_id
+        - customer_id
+        - subtotal
+        - tax_rate
+        - tax_amount
+        - total_amount
+        - amount_paid
+        - amount_due
+        - issued_at
+      properties:
+        id:
+          type: string
+        invoice_number:
+          type: string
+        order_id:
+          type: string
+        customer_id:
+          type: string
+        subtotal:
+          type: number
+        tax_rate:
+          type: number
+        tax_amount:
+          type: number
+        total_amount:
+          type: number
+        amount_paid:
+          type: number
+        amount_due:
+          type: number
+        issued_at:
+          type: string
+          format: date-time
+        due_date:
+          type: string
+          format: date-time
+          nullable: true
+        paid_at:
+          type: string
+          format: date-time
+          nullable: true
+        invoice_url:
+          type: string
+          nullable: true
+    GalleryItem:
+      type: object
+      required:
+        - id
+        - title
+        - slug
+        - description
+        - client_approved_display
+        - is_featured
+        - is_visible
+        - sort_order
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        service_category_id:
+          type: string
+          nullable: true
+        service_id:
+          type: string
+          nullable: true
+        tier_used:
+          type: string
+          nullable: true
+        client_name:
+          type: string
+          nullable: true
+        client_approved_display:
+          type: boolean
+        testimonial_quote:
+          type: string
+          nullable: true
+        timeline_description:
+          type: string
+          nullable: true
+        is_featured:
+          type: boolean
+        is_visible:
+          type: boolean
+        sort_order:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    GalleryImage:
+      type: object
+      required:
+        - id
+        - gallery_item_id
+        - image_url
+        - is_primary
+        - sort_order
+      properties:
+        id:
+          type: string
+        gallery_item_id:
+          type: string
+        image_url:
+          type: string
+        caption:
+          type: string
+          nullable: true
+        is_primary:
+          type: boolean
+        sort_order:
+          type: integer
+    Material:
+      type: object
+      required:
+        - id
+        - sku
+        - name
+        - category
+        - unit
+        - cost_per_unit
+        - is_active
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        sku:
+          type: string
+        name:
+          type: string
+        category:
+          type: string
+        unit:
+          type: string
+        cost_per_unit:
+          type: number
+        supplier_name:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CapacitySetting:
+      type: object
+      required:
+        - id
+        - day_of_week
+        - is_working_day
+        - default_slots
+        - emergency_slots_max
+        - emergency_fee_percentage
+      properties:
+        id:
+          type: string
+        day_of_week:
+          type: integer
+        is_working_day:
+          type: boolean
+        start_time:
+          type: string
+          nullable: true
+        end_time:
+          type: string
+          nullable: true
+        default_slots:
+          type: integer
+        emergency_slots_max:
+          type: integer
+        emergency_fee_percentage:
+          type: number
+    CapacityOverride:
+      type: object
+      required:
+        - id
+        - override_date
+        - slots_available
+        - created_at
+      properties:
+        id:
+          type: string
+        override_date:
+          type: string
+          format: date
+        slots_available:
+          type: integer
+        reason:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    BlackoutDate:
+      type: object
+      required:
+        - id
+        - start_date
+        - end_date
+        - created_at
+      properties:
+        id:
+          type: string
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        reason:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    ContactInquiry:
+      type: object
+      required:
+        - id
+        - name
+        - email
+        - subject
+        - message
+        - status
+        - created_at
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+          nullable: true
+        subject:
+          type: string
+        message:
+          type: string
+        status:
+          type: string
+          enum:
+            - NEW
+            - REPLIED
+            - RESOLVED
+            - SPAM
+        replied_at:
+          type: string
+          format: date-time
+          nullable: true
+        resolved_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    ContentSection:
+      type: object
+      required:
+        - id
+        - section_key
+        - section_type
+        - content
+        - updated_at
+      properties:
+        id:
+          type: string
+        section_key:
+          type: string
+        section_type:
+          type: string
+          enum:
+            - HERO
+            - TEXT
+            - FEATURES
+            - JSON
+        content:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+    TeamMember:
+      type: object
+      required:
+        - id
+        - name
+        - role
+        - bio
+        - sort_order
+        - is_visible
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+        photo_url:
+          type: string
+          nullable: true
+        bio:
+          type: string
+        sort_order:
+          type: integer
+        is_visible:
+          type: boolean
+    FAQ:
+      type: object
+      required:
+        - id
+        - question
+        - answer
+        - category
+        - is_active
+        - sort_order
+      properties:
+        id:
+          type: string
+        question:
+          type: string
+        answer:
+          type: string
+        category:
+          type: string
+        is_active:
+          type: boolean
+        sort_order:
+          type: integer
+    AppSetting:
+      type: object
+      required:
+        - id
+        - setting_key
+        - setting_value
+        - setting_type
+        - updated_at
+      properties:
+        id:
+          type: string
+        setting_key:
+          type: string
+        setting_value:
+          type: string
+        setting_type:
+          type: string
+          enum:
+            - STRING
+            - NUMBER
+            - BOOLEAN
+            - JSON
+        description:
+          type: string
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+    FeatureFlag:
+      type: object
+      required:
+        - id
+        - flag_key
+        - flag_name
+        - is_enabled
+        - updated_at
+      properties:
+        id:
+          type: string
+        flag_key:
+          type: string
+        flag_name:
+          type: string
+        is_enabled:
+          type: boolean
+        description:
+          type: string
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+    AuditLog:
+      type: object
+      required:
+        - id
+        - user_id
+        - action
+        - target_type
+        - target_id
+        - created_at
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        action:
+          type: string
+        target_type:
+          type: string
+        target_id:
+          type: string
+        changes:
+          type: string
+          nullable: true
+        ip_address:
+          type: string
+          nullable: true
+        user_agent:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    Notification:
+      type: object
+      required:
+        - id
+        - user_id
+        - notification_type
+        - title
+        - message
+        - is_read
+        - created_at
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        notification_type:
+          type: string
+          enum:
+            - ORDER_COMPLETED
+            - PROOF_READY
+            - QUOTE_APPROVED
+            - ORDER_IN_PRODUCTION
+            - MESSAGE_RECEIVED
+            - PAYMENT_RECEIVED
+            - NEW_ORDER
+        title:
+          type: string
+        message:
+          type: string
+        link_url:
+          type: string
+          nullable: true
+        is_read:
+          type: boolean
+        read_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    B2BAccount:
+      type: object
+      required:
+        - id
+        - company_name
+        - main_contact_id
+        - contract_start_date
+        - contract_end_date
+        - status
+        - consolidated_invoicing
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        company_name:
+          type: string
+        main_contact_id:
+          type: string
+        account_manager_id:
+          type: string
+          nullable: true
+        contract_start_date:
+          type: string
+          format: date
+        contract_end_date:
+          type: string
+          format: date
+        contract_terms:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - SUSPENDED
+            - EXPIRED
+        consolidated_invoicing:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    B2BLocation:
+      type: object
+      required:
+        - id
+        - account_id
+        - location_name
+        - address
+        - created_at
+      properties:
+        id:
+          type: string
+        account_id:
+          type: string
+        location_name:
+          type: string
+        address:
+          type: string
+        contact_person:
+          type: string
+          nullable: true
+        contact_phone:
+          type: string
+          nullable: true
+        contact_email:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    ContractPricing:
+      type: object
+      required:
+        - id
+        - account_id
+        - service_id
+        - tier_id
+        - created_at
+      properties:
+        id:
+          type: string
+        account_id:
+          type: string
+        service_id:
+          type: string
+        tier_id:
+          type: string
+        contract_price:
+          type: number
+          nullable: true
+        discount_percentage:
+          type: number
+          nullable: true
+        effective_date:
+          type: string
+          format: date
+          nullable: true
+        expiry_date:
+          type: string
+          format: date
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    InventoryItem:
+      type: object
+      required:
+        - id
+        - sku
+        - name
+        - category
+        - unit
+        - qty_on_hand
+        - reorder_point
+        - reorder_qty
+        - cost_per_unit
+        - is_active
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        sku:
+          type: string
+        name:
+          type: string
+        category:
+          type: string
+        unit:
+          type: string
+        qty_on_hand:
+          type: integer
+        reorder_point:
+          type: integer
+        reorder_qty:
+          type: integer
+        supplier_name:
+          type: string
+          nullable: true
+        cost_per_unit:
+          type: number
+        notes:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    MaterialConsumptionRule:
+      type: object
+      required:
+        - id
+        - service_id
+        - inventory_item_id
+        - qty_per_unit
+        - created_at
+      properties:
+        id:
+          type: string
+        service_id:
+          type: string
+        inventory_item_id:
+          type: string
+        qty_per_unit:
+          type: number
+        tier_filter:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    InventoryTransaction:
+      type: object
+      required:
+        - id
+        - inventory_item_id
+        - transaction_type
+        - qty_change
+        - reason
+        - created_at
+      properties:
+        id:
+          type: string
+        inventory_item_id:
+          type: string
+        transaction_type:
+          type: string
+          enum:
+            - PURCHASE
+            - CONSUMPTION
+            - ADJUSTMENT
+            - RETURN
+        qty_change:
+          type: integer
+        reason:
+          type: string
+        order_id:
+          type: string
+          nullable: true
+        purchase_order_id:
+          type: string
+          nullable: true
+        user_id:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    PurchaseOrder:
+      type: object
+      required:
+        - id
+        - po_number
+        - supplier_name
+        - status
+        - total_cost
+        - created_by_id
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        po_number:
+          type: string
+        supplier_name:
+          type: string
+        status:
+          type: string
+          enum:
+            - DRAFT
+            - SENT
+            - RECEIVED
+            - CANCELLED
+        total_cost:
+          type: number
+        notes:
+          type: string
+          nullable: true
+        created_by_id:
+          type: string
+        sent_at:
+          type: string
+          format: date-time
+          nullable: true
+        received_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    PurchaseOrderItem:
+      type: object
+      required:
+        - id
+        - purchase_order_id
+        - inventory_item_id
+        - qty_ordered
+        - qty_received
+        - unit_cost
+        - line_total
+      properties:
+        id:
+          type: string
+        purchase_order_id:
+          type: string
+        inventory_item_id:
+          type: string
+        qty_ordered:
+          type: integer
+        qty_received:
+          type: integer
+        unit_cost:
+          type: number
+        line_total:
+          type: number
+    SLABreach:
+      type: object
+      required:
+        - id
+        - order_id
+        - breach_type
+        - target_time
+        - created_at
+      properties:
+        id:
+          type: string
+        order_id:
+          type: string
+        breach_type:
+          type: string
+          enum:
+            - PROOF_DELAY
+            - PRODUCTION_DELAY
+            - RESPONSE_DELAY
+        target_time:
+          type: string
+          format: date-time
+        actual_time:
+          type: string
+          format: date-time
+          nullable: true
+        breach_duration_hours:
+          type: number
+          nullable: true
+        reason:
+          type: string
+          nullable: true
+        resolved_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    SLATimer:
+      type: object
+      required:
+        - id
+        - order_id
+        - timer_type
+        - started_at
+        - due_at
+        - is_breached
+        - breach_notified
+      properties:
+        id:
+          type: string
+        order_id:
+          type: string
+        timer_type:
+          type: string
+          enum:
+            - FIRST_PROOF
+            - REVISION_TURNAROUND
+            - PRODUCTION
+        started_at:
+          type: string
+          format: date-time
+        due_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        is_breached:
+          type: boolean
+        breach_notified:
+          type: boolean

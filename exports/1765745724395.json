@@ -1,0 +1,19 @@
+{
+  "timestamp": 1765745724395,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "UV_StaffMessages",
+      "version": "1765745633639"
+    }
+  },
+  "projectId": "build-a-production-ready-web",
+  "files": [
+    {
+      "path": "/mnt/data/build-a-production-ready-web/vitereact/src/components/views/UV_StaffMessages.tsx",
+      "type": "text",
+      "size": 20776,
+      "dependencies": false
+    }
+  ]
+}

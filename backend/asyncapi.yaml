@@ -1,0 +1,1439 @@
+asyncapi: 2.6.0
+info:
+  title: SultanStamp Realtime Events API
+  version: 1.0.0
+  description: >
+    AsyncAPI specification for SultanStamp's realtime event system.
+
+    Covers all realtime notifications, status updates, messaging, and
+    collaboration features.
+
+
+    CRITICAL: All IDs are strings, all field names use snake_case as per Zod
+    schemas.
+  contact:
+    name: SultanStamp Development Team
+    email: dev@sultanstamp.com
+servers:
+  development:
+    url: ws://localhost:3000/ws
+    protocol: ws
+    description: Local development WebSocket server
+  production:
+    url: wss://sultanstamp.com/ws
+    protocol: wss
+    description: Production WebSocket server
+channels:
+  quote/updated:
+    description: Quote status or details updated (admin finalization, status changes)
+    subscribe:
+      summary: Subscribe to quote updates
+      operationId: onQuoteUpdated
+      message:
+        $ref: "#/components/messages/QuoteUpdated"
+    publish:
+      summary: Publish quote update event
+      operationId: publishQuoteUpdate
+      message:
+        $ref: "#/components/messages/QuoteUpdated"
+  order/status_changed:
+    description: Order status changed by staff or system
+    subscribe:
+      summary: Subscribe to order status changes
+      operationId: onOrderStatusChanged
+      message:
+        $ref: "#/components/messages/OrderStatusChanged"
+    publish:
+      summary: Publish order status change
+      operationId: publishOrderStatusChange
+      message:
+        $ref: "#/components/messages/OrderStatusChanged"
+  order/assigned:
+    description: Order assigned to staff member
+    subscribe:
+      summary: Subscribe to order assignment events
+      operationId: onOrderAssigned
+      message:
+        $ref: "#/components/messages/OrderAssigned"
+    publish:
+      summary: Publish order assignment
+      operationId: publishOrderAssignment
+      message:
+        $ref: "#/components/messages/OrderAssigned"
+  proof/uploaded:
+    description: Staff uploaded new proof version for customer review
+    subscribe:
+      summary: Subscribe to proof upload events
+      operationId: onProofUploaded
+      message:
+        $ref: "#/components/messages/ProofUploaded"
+    publish:
+      summary: Publish proof upload event
+      operationId: publishProofUpload
+      message:
+        $ref: "#/components/messages/ProofUploaded"
+  proof/status_changed:
+    description: Proof status changed (approved, revision requested)
+    subscribe:
+      summary: Subscribe to proof status changes
+      operationId: onProofStatusChanged
+      message:
+        $ref: "#/components/messages/ProofStatusChanged"
+    publish:
+      summary: Publish proof status change
+      operationId: publishProofStatusChange
+      message:
+        $ref: "#/components/messages/ProofStatusChanged"
+  message/sent:
+    description: New message sent in order or quote thread
+    subscribe:
+      summary: Subscribe to new messages
+      operationId: onMessageSent
+      message:
+        $ref: "#/components/messages/MessageSent"
+    publish:
+      summary: Publish new message
+      operationId: publishMessage
+      message:
+        $ref: "#/components/messages/MessageSent"
+  message/read:
+    description: Message marked as read
+    subscribe:
+      summary: Subscribe to message read receipts
+      operationId: onMessageRead
+      message:
+        $ref: "#/components/messages/MessageRead"
+    publish:
+      summary: Publish message read event
+      operationId: publishMessageRead
+      message:
+        $ref: "#/components/messages/MessageRead"
+  payment/updated:
+    description: Payment status updated (verified, completed, refunded)
+    subscribe:
+      summary: Subscribe to payment updates
+      operationId: onPaymentUpdated
+      message:
+        $ref: "#/components/messages/PaymentUpdated"
+    publish:
+      summary: Publish payment update
+      operationId: publishPaymentUpdate
+      message:
+        $ref: "#/components/messages/PaymentUpdated"
+  booking/confirmed:
+    description: Booking created and confirmed
+    subscribe:
+      summary: Subscribe to booking confirmations
+      operationId: onBookingConfirmed
+      message:
+        $ref: "#/components/messages/BookingConfirmed"
+    publish:
+      summary: Publish booking confirmation
+      operationId: publishBookingConfirmation
+      message:
+        $ref: "#/components/messages/BookingConfirmed"
+  booking/updated:
+    description: Booking rescheduled or status changed
+    subscribe:
+      summary: Subscribe to booking updates
+      operationId: onBookingUpdated
+      message:
+        $ref: "#/components/messages/BookingUpdated"
+    publish:
+      summary: Publish booking update
+      operationId: publishBookingUpdate
+      message:
+        $ref: "#/components/messages/BookingUpdated"
+  sla_breach/created:
+    description: SLA timer breached for order (Phase 2)
+    subscribe:
+      summary: Subscribe to SLA breach alerts
+      operationId: onSLABreach
+      message:
+        $ref: "#/components/messages/SLABreachCreated"
+    publish:
+      summary: Publish SLA breach alert
+      operationId: publishSLABreach
+      message:
+        $ref: "#/components/messages/SLABreachCreated"
+  sla_timer/updated:
+    description: SLA timer status updated (approaching, breached, completed)
+    subscribe:
+      summary: Subscribe to SLA timer updates
+      operationId: onSLATimerUpdated
+      message:
+        $ref: "#/components/messages/SLATimerUpdated"
+    publish:
+      summary: Publish SLA timer update
+      operationId: publishSLATimerUpdate
+      message:
+        $ref: "#/components/messages/SLATimerUpdated"
+  inventory/low_stock:
+    description: Inventory item fell below reorder point (Phase 2)
+    subscribe:
+      summary: Subscribe to low stock alerts
+      operationId: onLowStockAlert
+      message:
+        $ref: "#/components/messages/InventoryLowStock"
+    publish:
+      summary: Publish low stock alert
+      operationId: publishLowStockAlert
+      message:
+        $ref: "#/components/messages/InventoryLowStock"
+  inventory/updated:
+    description: Inventory quantity changed (consumption, restock)
+    subscribe:
+      summary: Subscribe to inventory updates
+      operationId: onInventoryUpdated
+      message:
+        $ref: "#/components/messages/InventoryUpdated"
+    publish:
+      summary: Publish inventory update
+      operationId: publishInventoryUpdate
+      message:
+        $ref: "#/components/messages/InventoryUpdated"
+  notification/created:
+    description: New in-app notification created for user
+    subscribe:
+      summary: Subscribe to notifications
+      operationId: onNotificationCreated
+      message:
+        $ref: "#/components/messages/NotificationCreated"
+    publish:
+      summary: Publish notification
+      operationId: publishNotification
+      message:
+        $ref: "#/components/messages/NotificationCreated"
+  checklist_item/updated:
+    description: Order checklist item completed by staff
+    subscribe:
+      summary: Subscribe to checklist updates
+      operationId: onChecklistItemUpdated
+      message:
+        $ref: "#/components/messages/ChecklistItemUpdated"
+    publish:
+      summary: Publish checklist item update
+      operationId: publishChecklistItemUpdate
+      message:
+        $ref: "#/components/messages/ChecklistItemUpdated"
+  capacity/updated:
+    description: Calendar capacity changed for specific date
+    subscribe:
+      summary: Subscribe to capacity updates
+      operationId: onCapacityUpdated
+      message:
+        $ref: "#/components/messages/CapacityUpdated"
+    publish:
+      summary: Publish capacity update
+      operationId: publishCapacityUpdate
+      message:
+        $ref: "#/components/messages/CapacityUpdated"
+  purchase_order/updated:
+    description: Purchase order status changed (sent, received) - Phase 2
+    subscribe:
+      summary: Subscribe to purchase order updates
+      operationId: onPurchaseOrderUpdated
+      message:
+        $ref: "#/components/messages/PurchaseOrderUpdated"
+    publish:
+      summary: Publish purchase order update
+      operationId: publishPurchaseOrderUpdate
+      message:
+        $ref: "#/components/messages/PurchaseOrderUpdated"
+  user/online_status:
+    description: User online/offline status for presence indicators
+    subscribe:
+      summary: Subscribe to user presence updates
+      operationId: onUserPresence
+      message:
+        $ref: "#/components/messages/UserPresence"
+    publish:
+      summary: Publish user presence
+      operationId: publishUserPresence
+      message:
+        $ref: "#/components/messages/UserPresence"
+components:
+  messages:
+    QuoteUpdated:
+      name: QuoteUpdated
+      title: Quote Updated Event
+      summary: Emitted when quote details or status changes
+      contentType: application/json
+      payload:
+        type: object
+        required:
+          - event_type
+          - timestamp
+          - quote
+        properties:
+          event_type:
+            type: string
+            enum:
+              - quote.updated
+          timestamp:
+            type: string
+            format: date-time
+          quote:
+            type: object
+            required:
+              - id
+              - quote_number
+              - customer_id
+              - service_id
+              - status
+            properties:
+              id:
+                type: string
+              quote_number:
+                type: string
+              customer_id:
+                type: string
+              service_id:
+                type: string
+              tier_id:
+                type: string
+                nullable: true
+              status:
+                type: string
+                enum:
+                  - QUOTE_REQUESTED
+                  - UNDER_REVIEW
+                  - PENDING_APPROVAL
+                  - FINALIZED
+                  - REJECTED
+                  - EXPIRED
+              estimate_min:
+                type: number
+                nullable: true
+              estimate_max:
+                type: number
+                nullable: true
+              final_subtotal:
+                type: number
+                nullable: true
+              tax_rate:
+                type: number
+                nullable: true
+              tax_amount:
+                type: number
+                nullable: true
+              total_amount:
+                type: number
+                nullable: true
+              admin_notes:
+                type: string
+                nullable: true
+              finalized_at:
+                type: string
+                format: date-time
+                nullable: true
+              updated_at:
+                type: string
+                format: date-time
+          previous_status:
+            type: string
+            nullable: true
+          updated_by_user_id:
+            type: string
+          notification_message:
+            type: string
+    OrderStatusChanged:
+      name: OrderStatusChanged
+      title: Order Status Changed Event
+      summary: Emitted when order status transitions to new state
+      contentType: application/json
+      payload:
+        type: object
+        required:
+          - event_type
+          - timestamp
+          - order
+          - previous_status
+          - new_status
+        properties:
+          event_type:
+            type: string
+            enum:
+              - order.status_changed
+          timestamp:
+            type: string
+            format: date-time
+          order:
+            type: object
+            required:
+              - id
+              - order_number
+              - customer_id
+              - service_id
+              - tier_id
+              - status
+            properties:
+              id:
+                type: string
+              order_number:
+                type: string
+              customer_id:
+                type: string
+              service_id:
+                type: string
+              tier_id:
+                type: string
+              assigned_staff_id:
+                type: string
+                nullable: true
+              status:
+                type: string
+                enum:
+                  - DEPOSIT_PAID
+                  - DESIGN_IN_PROGRESS
+                  - WAITING_APPROVAL
+                  - IN_PRODUCTION
+                  - QUALITY_CHECK
+                  - READY_FOR_PICKUP
+                  - SHIPPED
+                  - COMPLETED
+                  - CANCELLED
+              due_at:
+                type: string
+                format: date-time
+                nullable: true
+              priority:
+                type: integer
+              sla_breached:
+                type: boolean
+          previous_status:
+            type: string
+          new_status:
+            type: string
+          updated_by_user_id:
+            type: string
+          status_note:
+            type: string
+            nullable: true
+          notification_message:
+            type: string
+    OrderAssigned:
+      name: OrderAssigned
+      title: Order Assigned Event
+      summary: Emitted when order assigned to staff member
+      contentType: application/json
+      payload:
+        type: object
+        required:
+          - event_type
+          - timestamp
+          - order_id
+          - order_number
+          - assigned_staff_id
+        properties:
+          event_type:
+            type: string
+            enum:
+              - order.assigned
+          timestamp:
+            type: string
+            format: date-time
+          order_id:
+            type: string
+          order_number:
+            type: string
+          customer_id:
+            type: string
+          service_id:
+            type: string
+          tier_id:
+            type: string
+          assigned_staff_id:
+            type: string
+          previous_staff_id:
+            type: string
+            nullable: true
+          assigned_by_user_id:
+            type: string
+          due_at:
+            type: string
+            format: date-time
+            nullable: true
+          priority:
+            type: integer
+          notification_message:
+            type: string
+    ProofUploaded:
+      name: ProofUploaded
+      title: Proof Uploaded Event
+      summary: Emitted when staff uploads new proof version
+      contentType: application/json
+      payload:
+        type: object
+        required:
+          - event_type
+          - timestamp
+          - proof_version
+        properties:
+          event_type:
+            type: string
+            enum:
+              - proof.uploaded
+          timestamp:
+            type: string
+            format: date-time
+          proof_version:
+            type: object
+            required:
+              - id
+              - order_id
+              - version_number
+              - file_url
+              - created_by_staff_id
+              - status
+            properties:
+              id:
+                type: string
+              order_id:
+                type: string
+              version_number:
+                type: integer
+              file_url:
+                type: string
+              created_by_staff_id:
+                type: string
+              status:
+                type: string
+                enum:
+                  - SENT
+                  - VIEWED
+                  - APPROVED
+                  - REVISION_REQUESTED
+              staff_message:
+                type: string
+                nullable: true
+              created_at:
+                type: string
+                format: date-time
+          order_number:
+            type: string
+          customer_id:
+            type: string
+          tier_id:
+            type: string
+          revisions_remaining:
+            type: integer
+            nullable: true
+          notification_message:
+            type: string
+    ProofStatusChanged:
+      name: ProofStatusChanged
+      title: Proof Status Changed Event
+      summary: Emitted when customer approves or requests changes
+      contentType: application/json
+      payload:
+        type: object
+        required:
+          - event_type
+          - timestamp
+          - proof_version_id
+          - order_id
+          - previous_status
+          - new_status
+        properties:
+          event_type:
+            type: string
+            enum:
+              - proof.status_changed
+          timestamp:
+            type: string
+            format: date-time
+          proof_version_id:
+            type: string
+          order_id:
+            type: string
+          order_number:
+            type: string
+          version_number:
+            type: integer
+          previous_status:
+            type: string
+          new_status:
+            type: string
+            enum:
+              - SENT
+              - VIEWED
+              - APPROVED
+              - REVISION_REQUESTED
+          customer_comment:
+            type: string
+            nullable: true
+          customer_id:
+            type: string
+          assigned_staff_id:
+            type: string
+            nullable: true
+          revisions_used:
+            type: integer
+          revisions_remaining:
+            type: integer
+            nullable: true
+          approved_at:
+            type: string
+            format: date-time
+            nullable: true
+          notification_message:
+            type: string
+    MessageSent:
+      name: MessageSent
+      title: Message Sent Event
+      summary: Emitted when new message posted in thread
+      contentType: application/json
+      payload:
+        type: object
+        required:
+          - event_type
+          - timestamp
+          - message
+        properties:
+          event_type:
+            type: string
+            enum:
+              - message.sent
+          timestamp:
+            type: string
+            format: date-time
+          message:
+            type: object
+            required:
+              - id
+              - thread_id
+              - sender_id
+              - body
+              - created_at
+            properties:
+              id:
+                type: string
+              thread_id:
+                type: string
+              sender_id:
+                type: string
+              body:
+                type: string
+              is_read:
+                type: boolean
+              created_at:
+                type: string
+                format: date-time
+          thread:
+            type: object
+            required:
+              - id
+              - customer_id
+            properties:
+              id:
+                type: string
+              quote_id:
+                type: string
+                nullable: true
+              order_id:
+                type: string
+                nullable: true
+              customer_id:
+                type: string
+          sender:
+            type: object
+            required:
+              - id
+              - name
+              - role
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              role:
+                type: string
+                enum:
+                  - ADMIN
+                  - STAFF
+                  - CUSTOMER
+          recipient_user_ids:
+            type: array
+            items:
+              type: string
+          notification_message:
+            type: string
+    MessageRead:
+      name: MessageRead
+      title: Message Read Event
+      summary: Emitted when message marked as read
+      contentType: application/json
+      payload:
+        type: object
+        required:
+          - event_type
+          - timestamp
+          - message_id
+          - thread_id
+          - read_by_user_id
+        properties:
+          event_type:
+            type: string
+            enum:
+              - message.read
+          timestamp:
+            type: string
+            format: date-time
+          message_id:
+            type: string
+          thread_id:
+            type: string
+          read_by_user_id:
+            type: string
+          read_at:
+            type: string
+            format: date-time
+          sender_id:
+            type: string
+    PaymentUpdated:
+      name: PaymentUpdated
+      title: Payment Updated Event
+      summary: Emitted when payment status changes
+      contentType: application/json
+      payload:
+        type: object
+        required:
+          - event_type
+          - timestamp
+          - payment
+        properties:
+          event_type:
+            type: string
+            enum:
+              - payment.updated
+          timestamp:
+            type: string
+            format: date-time
+          payment:
+            type: object
+            required:
+              - id
+              - payment_number
+              - order_id
+              - amount
+              - method
+              - status
+            properties:
+              id:
+                type: string
+              payment_number:
+                type: string
+              order_id:
+                type: string
+              amount:
+                type: number
+              method:
+                type: string
+                enum:
+                  - CREDIT_CARD
+                  - BANK_TRANSFER
+                  - CHECK
+                  - CASH
+              status:
+                type: string
+                enum:
+                  - PENDING
+                  - COMPLETED
+                  - FAILED
+                  - REFUNDED
+              transaction_ref:
+                type: string
+                nullable: true
+              payment_date:
+                type: string
+                format: date-time
+                nullable: true
+              verified_by_admin_id:
+                type: string
+                nullable: true
+              verified_at:
+                type: string
+                format: date-time
+                nullable: true
+              refund_amount:
+                type: number
+                nullable: true
+              refund_reason:
+                type: string
+                nullable: true
+              updated_at:
+                type: string
+                format: date-time
+          order_number:
+            type: string
+          customer_id:
+            type: string
+          previous_status:
+            type: string
+          new_status:
+            type: string
+          notification_message:
+            type: string
+    BookingConfirmed:
+      name: BookingConfirmed
+      title: Booking Confirmed Event
+      summary: Emitted when booking created and confirmed
+      contentType: application/json
+      payload:
+        type: object
+        required:
+          - event_type
+          - timestamp
+          - booking
+        properties:
+          event_type:
+            type: string
+            enum:
+              - booking.confirmed
+          timestamp:
+            type: string
+            format: date-time
+          booking:
+            type: object
+            required:
+              - id
+              - quote_id
+              - customer_id
+              - booking_date
+              - status
+            properties:
+              id:
+                type: string
+              quote_id:
+                type: string
+              customer_id:
+                type: string
+              booking_date:
+                type: string
+                format: date-time
+              time_slot:
+                type: string
+                nullable: true
+              status:
+                type: string
+                enum:
+                  - PENDING
+                  - CONFIRMED
+                  - COMPLETED
+                  - CANCELLED
+                  - RESCHEDULED
+              is_emergency:
+                type: boolean
+              emergency_fee_percentage:
+                type: number
+                nullable: true
+              emergency_fee_amount:
+                type: number
+                nullable: true
+              created_at:
+                type: string
+                format: date-time
+          quote_number:
+            type: string
+          service_id:
+            type: string
+          tier_id:
+            type: string
+          slots_remaining:
+            type: integer
+          notification_message:
+            type: string
+    BookingUpdated:
+      name: BookingUpdated
+      title: Booking Updated Event
+      summary: Emitted when booking rescheduled or status changed
+      contentType: application/json
+      payload:
+        type: object
+        required:
+          - event_type
+          - timestamp
+          - booking_id
+          - customer_id
+        properties:
+          event_type:
+            type: string
+            enum:
+              - booking.updated
+          timestamp:
+            type: string
+            format: date-time
+          booking_id:
+            type: string
+          quote_id:
+            type: string
+          customer_id:
+            type: string
+          previous_booking_date:
+            type: string
+            format: date-time
+            nullable: true
+          new_booking_date:
+            type: string
+            format: date-time
+          previous_time_slot:
+            type: string
+            nullable: true
+          new_time_slot:
+            type: string
+            nullable: true
+          previous_status:
+            type: string
+          new_status:
+            type: string
+            enum:
+              - PENDING
+              - CONFIRMED
+              - COMPLETED
+              - CANCELLED
+              - RESCHEDULED
+          reschedule_count:
+            type: integer
+          updated_by_user_id:
+            type: string
+          notification_message:
+            type: string
+    SLABreachCreated:
+      name: SLABreachCreated
+      title: SLA Breach Created Event
+      summary: Emitted when SLA timer breaches deadline (Phase 2)
+      contentType: application/json
+      payload:
+        type: object
+        required:
+          - event_type
+          - timestamp
+          - sla_breach
+        properties:
+          event_type:
+            type: string
+            enum:
+              - sla_breach.created
+          timestamp:
+            type: string
+            format: date-time
+          sla_breach:
+            type: object
+            required:
+              - id
+              - order_id
+              - breach_type
+              - target_time
+              - created_at
+            properties:
+              id:
+                type: string
+              order_id:
+                type: string
+              breach_type:
+                type: string
+                enum:
+                  - PROOF_DELAY
+                  - PRODUCTION_DELAY
+                  - RESPONSE_DELAY
+              target_time:
+                type: string
+                format: date-time
+              actual_time:
+                type: string
+                format: date-time
+                nullable: true
+              breach_duration_hours:
+                type: number
+                nullable: true
+              reason:
+                type: string
+                nullable: true
+              created_at:
+                type: string
+                format: date-time
+          order_number:
+            type: string
+          customer_id:
+            type: string
+          tier_id:
+            type: string
+          assigned_staff_id:
+            type: string
+            nullable: true
+          account_manager_id:
+            type: string
+            nullable: true
+          notification_message:
+            type: string
+    SLATimerUpdated:
+      name: SLATimerUpdated
+      title: SLA Timer Updated Event
+      summary: Emitted when SLA timer status changes (approaching, completed)
+      contentType: application/json
+      payload:
+        type: object
+        required:
+          - event_type
+          - timestamp
+          - sla_timer
+        properties:
+          event_type:
+            type: string
+            enum:
+              - sla_timer.updated
+          timestamp:
+            type: string
+            format: date-time
+          sla_timer:
+            type: object
+            required:
+              - id
+              - order_id
+              - timer_type
+              - started_at
+              - due_at
+              - is_breached
+            properties:
+              id:
+                type: string
+              order_id:
+                type: string
+              timer_type:
+                type: string
+                enum:
+                  - FIRST_PROOF
+                  - REVISION_TURNAROUND
+                  - PRODUCTION
+              started_at:
+                type: string
+                format: date-time
+              due_at:
+                type: string
+                format: date-time
+              completed_at:
+                type: string
+                format: date-time
+                nullable: true
+              is_breached:
+                type: boolean
+              breach_notified:
+                type: boolean
+          order_number:
+            type: string
+          customer_id:
+            type: string
+          tier_id:
+            type: string
+          time_remaining_hours:
+            type: number
+            nullable: true
+          status_indicator:
+            type: string
+            enum:
+              - on_track
+              - approaching
+              - breached
+          notification_message:
+            type: string
+    InventoryLowStock:
+      name: InventoryLowStock
+      title: Inventory Low Stock Alert
+      summary: Emitted when inventory item falls below reorder point (Phase 2)
+      contentType: application/json
+      payload:
+        type: object
+        required:
+          - event_type
+          - timestamp
+          - inventory_item
+        properties:
+          event_type:
+            type: string
+            enum:
+              - inventory.low_stock
+          timestamp:
+            type: string
+            format: date-time
+          inventory_item:
+            type: object
+            required:
+              - id
+              - sku
+              - name
+              - qty_on_hand
+              - reorder_point
+              - reorder_qty
+            properties:
+              id:
+                type: string
+              sku:
+                type: string
+              name:
+                type: string
+              category:
+                type: string
+              unit:
+                type: string
+              qty_on_hand:
+                type: integer
+              reorder_point:
+                type: integer
+              reorder_qty:
+                type: integer
+              supplier_name:
+                type: string
+                nullable: true
+              cost_per_unit:
+                type: number
+          purchase_order_created:
+            type: boolean
+          purchase_order_id:
+            type: string
+            nullable: true
+          notification_message:
+            type: string
+    InventoryUpdated:
+      name: InventoryUpdated
+      title: Inventory Updated Event
+      summary: Emitted when inventory quantity changes
+      contentType: application/json
+      payload:
+        type: object
+        required:
+          - event_type
+          - timestamp
+          - inventory_item_id
+          - transaction
+        properties:
+          event_type:
+            type: string
+            enum:
+              - inventory.updated
+          timestamp:
+            type: string
+            format: date-time
+          inventory_item_id:
+            type: string
+          inventory_item:
+            type: object
+            required:
+              - sku
+              - name
+              - qty_on_hand
+            properties:
+              sku:
+                type: string
+              name:
+                type: string
+              qty_on_hand:
+                type: integer
+              reorder_point:
+                type: integer
+          transaction:
+            type: object
+            required:
+              - id
+              - transaction_type
+              - qty_change
+              - reason
+            properties:
+              id:
+                type: string
+              transaction_type:
+                type: string
+                enum:
+                  - PURCHASE
+                  - CONSUMPTION
+                  - ADJUSTMENT
+                  - RETURN
+              qty_change:
+                type: integer
+              reason:
+                type: string
+              order_id:
+                type: string
+                nullable: true
+              purchase_order_id:
+                type: string
+                nullable: true
+              user_id:
+                type: string
+                nullable: true
+              created_at:
+                type: string
+                format: date-time
+          previous_qty:
+            type: integer
+          new_qty:
+            type: integer
+          is_low_stock:
+            type: boolean
+    NotificationCreated:
+      name: NotificationCreated
+      title: Notification Created Event
+      summary: Emitted when new in-app notification created
+      contentType: application/json
+      payload:
+        type: object
+        required:
+          - event_type
+          - timestamp
+          - notification
+        properties:
+          event_type:
+            type: string
+            enum:
+              - notification.created
+          timestamp:
+            type: string
+            format: date-time
+          notification:
+            type: object
+            required:
+              - id
+              - user_id
+              - notification_type
+              - title
+              - message
+              - created_at
+            properties:
+              id:
+                type: string
+              user_id:
+                type: string
+              notification_type:
+                type: string
+                enum:
+                  - ORDER_COMPLETED
+                  - PROOF_READY
+                  - QUOTE_APPROVED
+                  - ORDER_IN_PRODUCTION
+                  - MESSAGE_RECEIVED
+                  - PAYMENT_RECEIVED
+                  - NEW_ORDER
+              title:
+                type: string
+              message:
+                type: string
+              link_url:
+                type: string
+                nullable: true
+              is_read:
+                type: boolean
+              created_at:
+                type: string
+                format: date-time
+    ChecklistItemUpdated:
+      name: ChecklistItemUpdated
+      title: Checklist Item Updated Event
+      summary: Emitted when order checklist item completed/updated by staff
+      contentType: application/json
+      payload:
+        type: object
+        required:
+          - event_type
+          - timestamp
+          - checklist_item
+        properties:
+          event_type:
+            type: string
+            enum:
+              - checklist_item.updated
+          timestamp:
+            type: string
+            format: date-time
+          checklist_item:
+            type: object
+            required:
+              - id
+              - order_id
+              - description
+              - is_completed
+            properties:
+              id:
+                type: string
+              order_id:
+                type: string
+              deliverable_id:
+                type: string
+              description:
+                type: string
+              is_completed:
+                type: boolean
+              completed_at:
+                type: string
+                format: date-time
+                nullable: true
+              completed_by_staff_id:
+                type: string
+                nullable: true
+              notes:
+                type: string
+                nullable: true
+          order_number:
+            type: string
+          customer_id:
+            type: string
+          total_items:
+            type: integer
+          completed_items:
+            type: integer
+          completion_percentage:
+            type: number
+    CapacityUpdated:
+      name: CapacityUpdated
+      title: Capacity Updated Event
+      summary: Emitted when calendar capacity changes for date
+      contentType: application/json
+      payload:
+        type: object
+        required:
+          - event_type
+          - timestamp
+          - target_date
+        properties:
+          event_type:
+            type: string
+            enum:
+              - capacity.updated
+          timestamp:
+            type: string
+            format: date-time
+          target_date:
+            type: string
+            format: date
+          capacity_override:
+            type: object
+            nullable: true
+            properties:
+              id:
+                type: string
+              override_date:
+                type: string
+                format: date
+              slots_available:
+                type: integer
+              reason:
+                type: string
+                nullable: true
+          default_slots:
+            type: integer
+          current_slots_available:
+            type: integer
+          current_bookings_count:
+            type: integer
+          emergency_slots_available:
+            type: integer
+          is_blackout_date:
+            type: boolean
+    PurchaseOrderUpdated:
+      name: PurchaseOrderUpdated
+      title: Purchase Order Updated Event
+      summary: Emitted when purchase order status changes (Phase 2)
+      contentType: application/json
+      payload:
+        type: object
+        required:
+          - event_type
+          - timestamp
+          - purchase_order
+        properties:
+          event_type:
+            type: string
+            enum:
+              - purchase_order.updated
+          timestamp:
+            type: string
+            format: date-time
+          purchase_order:
+            type: object
+            required:
+              - id
+              - po_number
+              - supplier_name
+              - status
+              - total_cost
+            properties:
+              id:
+                type: string
+              po_number:
+                type: string
+              supplier_name:
+                type: string
+              status:
+                type: string
+                enum:
+                  - DRAFT
+                  - SENT
+                  - RECEIVED
+                  - CANCELLED
+              total_cost:
+                type: number
+              notes:
+                type: string
+                nullable: true
+              created_by_id:
+                type: string
+              sent_at:
+                type: string
+                format: date-time
+                nullable: true
+              received_at:
+                type: string
+                format: date-time
+                nullable: true
+              updated_at:
+                type: string
+                format: date-time
+          previous_status:
+            type: string
+          new_status:
+            type: string
+          items_count:
+            type: integer
+          updated_by_user_id:
+            type: string
+          notification_message:
+            type: string
+    UserPresence:
+      name: UserPresence
+      title: User Presence Event
+      summary: Emitted when user online/offline status changes
+      contentType: application/json
+      payload:
+        type: object
+        required:
+          - event_type
+          - timestamp
+          - user_id
+          - status
+        properties:
+          event_type:
+            type: string
+            enum:
+              - user.presence
+          timestamp:
+            type: string
+            format: date-time
+          user_id:
+            type: string
+          user_name:
+            type: string
+          user_role:
+            type: string
+            enum:
+              - ADMIN
+              - STAFF
+              - CUSTOMER
+          status:
+            type: string
+            enum:
+              - online
+              - away
+              - offline
+          last_seen:
+            type: string
+            format: date-time
+            nullable: true

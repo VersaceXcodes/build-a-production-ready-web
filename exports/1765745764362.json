@@ -1,0 +1,19 @@
+{
+  "timestamp": 1765745764362,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "UV_StaffProfile",
+      "version": "1765745633700"
+    }
+  },
+  "projectId": "build-a-production-ready-web",
+  "files": [
+    {
+      "path": "/mnt/data/build-a-production-ready-web/vitereact/src/components/views/UV_StaffProfile.tsx",
+      "type": "text",
+      "size": 24055,
+      "dependencies": false
+    }
+  ]
+}

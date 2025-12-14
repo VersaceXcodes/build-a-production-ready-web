@@ -1,0 +1,15 @@
+{
+  "timestamp": 1765744219402,
+  "operation": {
+    "id": "backend:specifications:openapi"
+  },
+  "projectId": "build-a-production-ready-web",
+  "files": [
+    {
+      "path": "/mnt/data/build-a-production-ready-web/backend/openapi.yaml",
+      "type": "text",
+      "size": 185468,
+      "dependencies": false
+    }
+  ]
+}

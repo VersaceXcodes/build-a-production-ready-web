@@ -1,0 +1,19 @@
+{
+  "timestamp": 1765745745707,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "UV_PricingManagement",
+      "version": "1765745633875"
+    }
+  },
+  "projectId": "build-a-production-ready-web",
+  "files": [
+    {
+      "path": "/mnt/data/build-a-production-ready-web/vitereact/src/components/views/UV_PricingManagement.tsx",
+      "type": "text",
+      "size": 27961,
+      "dependencies": false
+    }
+  ]
+}

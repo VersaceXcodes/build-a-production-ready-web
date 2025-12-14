@@ -1,0 +1,19 @@
+{
+  "timestamp": 1765745702472,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "UV_About",
+      "version": "latest"
+    }
+  },
+  "projectId": "build-a-production-ready-web",
+  "files": [
+    {
+      "path": "/mnt/data/build-a-production-ready-web/vitereact/src/components/views/UV_About.tsx",
+      "type": "text",
+      "size": 13938,
+      "dependencies": false
+    }
+  ]
+}

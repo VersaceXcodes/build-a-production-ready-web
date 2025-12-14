@@ -1,0 +1,19 @@
+{
+  "timestamp": 1765745172517,
+  "operation": {
+    "id": "webapp:react:store",
+    "refs": {
+      "id": "redux",
+      "version": "1765745047957"
+    }
+  },
+  "projectId": "build-a-production-ready-web",
+  "files": [
+    {
+      "path": "/mnt/data/build-a-production-ready-web/vitereact/src/store/main.tsx",
+      "type": "text",
+      "size": 25911,
+      "dependencies": false
+    }
+  ]
+}
