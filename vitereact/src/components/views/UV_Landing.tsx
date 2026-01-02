@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useAppStore } from '@/store/main';
-import { CheckCircle, Clock, DollarSign, ArrowRight, Sparkles, Upload, MessageSquare, Calendar, CheckSquare } from 'lucide-react';
+import { CheckCircle, Clock, DollarSign, ArrowRight, Sparkles, Upload, MessageSquare, Calendar, CheckSquare, CreditCard, FileText, Image, Tag, Package, Briefcase, Truck, Award, Zap } from 'lucide-react';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -135,12 +135,45 @@ const UV_Landing: React.FC = () => {
     <>
       {/* Hero Section */}
       <section className="relative bg-black text-white py-20 md:py-32 overflow-hidden">
+        {/* Animated gradient background */}
         <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black opacity-90"></div>
+        
+        {/* Animated gradient orbs for premium lighting effect */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div 
+            className="absolute -top-40 -left-40 w-80 h-80 bg-yellow-400/20 rounded-full blur-3xl animate-pulse"
+            style={{ animationDuration: '4s' }}
+          ></div>
+          <div 
+            className="absolute top-1/2 -right-20 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl animate-pulse"
+            style={{ animationDuration: '6s', animationDelay: '1s' }}
+          ></div>
+          <div 
+            className="absolute -bottom-20 left-1/3 w-72 h-72 bg-amber-400/15 rounded-full blur-3xl animate-pulse"
+            style={{ animationDuration: '5s', animationDelay: '2s' }}
+          ></div>
+        </div>
+        
+        {/* Subtle animated gradient overlay */}
+        <div 
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-400/5 to-transparent"
+          style={{
+            animation: 'shimmer 8s ease-in-out infinite',
+          }}
+        ></div>
+        
+        <style>{`
+          @keyframes shimmer {
+            0%, 100% { transform: translateX(-100%); opacity: 0; }
+            50% { transform: translateX(100%); opacity: 1; }
+          }
+        `}</style>
+        
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             {/* Brand Positioning */}
             <div className="flex items-center justify-center mb-6">
-              <Sparkles className="w-8 h-8 text-yellow-400 mr-3" />
+              <Sparkles className="w-8 h-8 text-yellow-400 mr-3 animate-pulse" />
               <span className="text-yellow-400 font-bold text-sm uppercase tracking-wider">
                 Premium Print & Branding Solutions
               </span>
@@ -157,27 +190,175 @@ const UV_Landing: React.FC = () => {
               disciplined timelines, transparent pricing, and uncompromising quality.
             </p>
 
-            {/* Dual CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            {/* Dual CTAs - Larger and more visible */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
               <button
                 onClick={handleGetQuoteClick}
-                className="group relative w-full sm:w-auto px-8 py-4 bg-yellow-400 text-black font-bold rounded-lg 
-                         hover:bg-yellow-500 transition-all duration-200 transform hover:scale-105 
-                         shadow-lg hover:shadow-2xl flex items-center justify-center"
+                className="group relative w-full sm:w-auto px-10 py-5 bg-yellow-400 text-black font-bold text-lg rounded-xl 
+                         hover:bg-yellow-500 transition-all duration-300 transform hover:scale-105 
+                         shadow-lg hover:shadow-yellow-400/30 hover:shadow-2xl flex items-center justify-center"
               >
                 Get Your Custom Quote
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />
               </button>
 
               <Link
                 to="/gallery"
-                className="w-full sm:w-auto px-8 py-4 bg-white text-black font-semibold rounded-lg 
-                         hover:bg-gray-100 transition-all duration-200 border-2 border-white 
+                className="w-full sm:w-auto px-10 py-5 bg-white text-black font-bold text-lg rounded-xl 
+                         hover:bg-gray-100 transition-all duration-300 border-2 border-white 
+                         shadow-lg hover:shadow-white/20 hover:shadow-xl transform hover:scale-105
                          flex items-center justify-center"
               >
                 View Our Portfolio
               </Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Popular Print Categories Section */}
+      <section className="py-16 md:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Promo Ribbon */}
+          <div className="flex justify-center mb-10">
+            <div className="inline-flex items-center gap-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-full shadow-lg">
+              <Truck className="w-5 h-5" />
+              <span className="font-semibold text-sm md:text-base">Fast delivery — Premium quality print at great prices</span>
+              <Award className="w-5 h-5" />
+            </div>
+          </div>
+
+          {/* Section Header */}
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Popular Print Categories
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Explore our most requested print products and get started on your next project
+            </p>
+          </div>
+
+          {/* Category Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            {/* Business Cards */}
+            <div className="group bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 md:p-8 border-2 border-blue-100 hover:border-blue-300 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="w-16 h-16 bg-blue-500 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                <CreditCard className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Business Cards</h3>
+              <p className="text-gray-600 mb-5 text-sm leading-relaxed">
+                Make powerful first impressions with premium cards that reflect your brand's professionalism
+              </p>
+              <Link
+                to="/services"
+                className="inline-flex items-center px-5 py-2.5 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors duration-200 shadow-md hover:shadow-lg"
+              >
+                Shop Now
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Link>
+            </div>
+
+            {/* Flyers & Brochures */}
+            <div className="group bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-6 md:p-8 border-2 border-orange-100 hover:border-orange-300 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="w-16 h-16 bg-orange-500 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                <FileText className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Flyers & Brochures</h3>
+              <p className="text-gray-600 mb-5 text-sm leading-relaxed">
+                Spread your message effectively with eye-catching designs that capture attention instantly
+              </p>
+              <Link
+                to="/services"
+                className="inline-flex items-center px-5 py-2.5 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition-colors duration-200 shadow-md hover:shadow-lg"
+              >
+                Shop Now
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Link>
+            </div>
+
+            {/* Posters & Banners */}
+            <div className="group bg-gradient-to-br from-purple-50 to-violet-50 rounded-2xl p-6 md:p-8 border-2 border-purple-100 hover:border-purple-300 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="w-16 h-16 bg-purple-500 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                <Image className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Posters & Banners</h3>
+              <p className="text-gray-600 mb-5 text-sm leading-relaxed">
+                Stand out at events and in-store with large format prints that demand attention
+              </p>
+              <Link
+                to="/services"
+                className="inline-flex items-center px-5 py-2.5 bg-purple-500 text-white font-semibold rounded-lg hover:bg-purple-600 transition-colors duration-200 shadow-md hover:shadow-lg"
+              >
+                Shop Now
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Link>
+            </div>
+
+            {/* Stickers & Labels */}
+            <div className="group bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl p-6 md:p-8 border-2 border-pink-100 hover:border-pink-300 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="w-16 h-16 bg-pink-500 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                <Tag className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Stickers & Labels</h3>
+              <p className="text-gray-600 mb-5 text-sm leading-relaxed">
+                Custom stickers and labels that stick in customers' minds and on products everywhere
+              </p>
+              <Link
+                to="/services"
+                className="inline-flex items-center px-5 py-2.5 bg-pink-500 text-white font-semibold rounded-lg hover:bg-pink-600 transition-colors duration-200 shadow-md hover:shadow-lg"
+              >
+                Shop Now
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Link>
+            </div>
+
+            {/* Packaging & Custom Boxes */}
+            <div className="group bg-gradient-to-br from-teal-50 to-cyan-50 rounded-2xl p-6 md:p-8 border-2 border-teal-100 hover:border-teal-300 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="w-16 h-16 bg-teal-500 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                <Package className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Packaging & Custom Boxes</h3>
+              <p className="text-gray-600 mb-5 text-sm leading-relaxed">
+                Elevate your unboxing experience with custom packaging that delights customers
+              </p>
+              <Link
+                to="/services"
+                className="inline-flex items-center px-5 py-2.5 bg-teal-500 text-white font-semibold rounded-lg hover:bg-teal-600 transition-colors duration-200 shadow-md hover:shadow-lg"
+              >
+                Shop Now
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Link>
+            </div>
+
+            {/* Corporate Stationery */}
+            <div className="group bg-gradient-to-br from-slate-50 to-gray-100 rounded-2xl p-6 md:p-8 border-2 border-slate-200 hover:border-slate-400 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="w-16 h-16 bg-slate-700 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                <Briefcase className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Corporate Stationery</h3>
+              <p className="text-gray-600 mb-5 text-sm leading-relaxed">
+                Complete your brand identity with letterheads, envelopes, and presentation folders
+              </p>
+              <Link
+                to="/services"
+                className="inline-flex items-center px-5 py-2.5 bg-slate-700 text-white font-semibold rounded-lg hover:bg-slate-800 transition-colors duration-200 shadow-md hover:shadow-lg"
+              >
+                Shop Now
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+
+          {/* View All CTA */}
+          <div className="text-center mt-12">
+            <Link
+              to="/services"
+              className="inline-flex items-center px-8 py-4 bg-gray-900 text-white font-bold rounded-xl hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              <Zap className="mr-2 w-5 h-5 text-yellow-400" />
+              Browse All Products
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </Link>
           </div>
         </div>
       </section>
