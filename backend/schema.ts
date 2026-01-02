@@ -1337,6 +1337,17 @@ export type CreateAppSettingInput = z.infer<typeof createAppSettingInputSchema>;
 export type UpdateAppSettingInput = z.infer<typeof updateAppSettingInputSchema>;
 
 // ============================================
+// SYSTEM SETTINGS
+// ============================================
+
+export const systemSettingSchema = z.object({
+  id: z.string(),
+  key: z.string(),
+  value: z.any(),
+  updated_at: z.coerce.date()
+});
+
+// ============================================
 // FEATURE FLAGS
 // ============================================
 
