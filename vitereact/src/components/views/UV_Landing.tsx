@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useAppStore } from '@/store/main';
-import { CheckCircle, Clock, DollarSign, ArrowRight, Sparkles, Upload, MessageSquare, Calendar, CheckSquare, CreditCard, FileText, Image, Tag, Package, Briefcase, Truck, Award, Zap } from 'lucide-react';
+import { CheckCircle, Clock, DollarSign, ArrowRight, Sparkles, Upload, MessageSquare, Calendar, CheckSquare, CreditCard, FileText, Image, Tag, Package, Briefcase, Truck, Award, Zap, Store, Car, Maximize, Building2, Shirt, Lightbulb } from 'lucide-react';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -358,6 +358,195 @@ const UV_Landing: React.FC = () => {
               <Zap className="mr-2 w-5 h-5 text-yellow-400" />
               Browse All Products
               <ArrowRight className="ml-2 w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Premium Branding & Installation Services Section */}
+      <section className="relative py-20 md:py-28 bg-gradient-to-br from-gray-900 via-black to-gray-900 overflow-hidden">
+        {/* Subtle premium lighting effects */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-500/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-amber-500/5 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 left-0 w-64 h-64 bg-yellow-400/3 rounded-full blur-2xl"></div>
+        </div>
+        
+        {/* Subtle grid pattern overlay */}
+        <div 
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+            backgroundSize: '60px 60px'
+          }}
+        ></div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Header */}
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-yellow-400/10 border border-yellow-400/20 px-4 py-2 rounded-full mb-6">
+              <Sparkles className="w-4 h-4 text-yellow-400" />
+              <span className="text-yellow-400 text-sm font-semibold uppercase tracking-wider">Professional Services</span>
+            </div>
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-5 tracking-tight">
+              Premium Branding & Installation Services
+            </h2>
+            <p className="text-lg md:text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
+              Expert solutions for businesses that want professional finish and long-lasting impact.
+            </p>
+          </div>
+
+          {/* Premium Service Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            {/* Custom Signage & Storefront Branding */}
+            <div className="group relative bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl p-8 lg:p-10 border border-gray-700/50 hover:border-yellow-400/30 transition-all duration-500 hover:shadow-2xl hover:shadow-yellow-400/10 transform hover:-translate-y-2">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+              <div className="relative">
+                <div className="w-14 h-14 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-yellow-400/20 group-hover:scale-110 transition-transform duration-300">
+                  <Store className="w-7 h-7 text-black" />
+                </div>
+                <h3 className="text-xl lg:text-2xl font-bold text-white mb-3 group-hover:text-yellow-400 transition-colors duration-300">
+                  Custom Signage & Storefront Branding
+                </h3>
+                <p className="text-gray-400 mb-6 leading-relaxed">
+                  Transform your business facade with eye-catching signage that commands attention and builds instant brand recognition.
+                </p>
+                <Link
+                  to="/services"
+                  className="inline-flex items-center text-yellow-400 font-semibold hover:text-yellow-300 transition-colors duration-200 group/btn"
+                >
+                  Learn More
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-200" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Vehicle Graphics & Wraps */}
+            <div className="group relative bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl p-8 lg:p-10 border border-gray-700/50 hover:border-yellow-400/30 transition-all duration-500 hover:shadow-2xl hover:shadow-yellow-400/10 transform hover:-translate-y-2">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+              <div className="relative">
+                <div className="w-14 h-14 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-yellow-400/20 group-hover:scale-110 transition-transform duration-300">
+                  <Car className="w-7 h-7 text-black" />
+                </div>
+                <h3 className="text-xl lg:text-2xl font-bold text-white mb-3 group-hover:text-yellow-400 transition-colors duration-300">
+                  Vehicle Graphics & Wraps
+                </h3>
+                <p className="text-gray-400 mb-6 leading-relaxed">
+                  Turn your fleet into mobile billboards with premium vehicle wraps that generate thousands of daily impressions.
+                </p>
+                <Link
+                  to="/services"
+                  className="inline-flex items-center text-yellow-400 font-semibold hover:text-yellow-300 transition-colors duration-200 group/btn"
+                >
+                  Learn More
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-200" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Large-Format Print & Installations */}
+            <div className="group relative bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl p-8 lg:p-10 border border-gray-700/50 hover:border-yellow-400/30 transition-all duration-500 hover:shadow-2xl hover:shadow-yellow-400/10 transform hover:-translate-y-2">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+              <div className="relative">
+                <div className="w-14 h-14 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-yellow-400/20 group-hover:scale-110 transition-transform duration-300">
+                  <Maximize className="w-7 h-7 text-black" />
+                </div>
+                <h3 className="text-xl lg:text-2xl font-bold text-white mb-3 group-hover:text-yellow-400 transition-colors duration-300">
+                  Large-Format Print & Installations
+                </h3>
+                <p className="text-gray-400 mb-6 leading-relaxed">
+                  Make a massive impact with wall murals, exhibition displays, and outdoor installations that stop people in their tracks.
+                </p>
+                <Link
+                  to="/services"
+                  className="inline-flex items-center text-yellow-400 font-semibold hover:text-yellow-300 transition-colors duration-200 group/btn"
+                >
+                  Learn More
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-200" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Corporate Branding Solutions */}
+            <div className="group relative bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl p-8 lg:p-10 border border-gray-700/50 hover:border-yellow-400/30 transition-all duration-500 hover:shadow-2xl hover:shadow-yellow-400/10 transform hover:-translate-y-2">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+              <div className="relative">
+                <div className="w-14 h-14 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-yellow-400/20 group-hover:scale-110 transition-transform duration-300">
+                  <Building2 className="w-7 h-7 text-black" />
+                </div>
+                <h3 className="text-xl lg:text-2xl font-bold text-white mb-3 group-hover:text-yellow-400 transition-colors duration-300">
+                  Corporate Branding Solutions
+                </h3>
+                <p className="text-gray-400 mb-6 leading-relaxed">
+                  End-to-end brand identity services from logo design to complete office branding that reflects your corporate vision.
+                </p>
+                <Link
+                  to="/services"
+                  className="inline-flex items-center text-yellow-400 font-semibold hover:text-yellow-300 transition-colors duration-200 group/btn"
+                >
+                  Learn More
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-200" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Apparel & Merchandise Printing */}
+            <div className="group relative bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl p-8 lg:p-10 border border-gray-700/50 hover:border-yellow-400/30 transition-all duration-500 hover:shadow-2xl hover:shadow-yellow-400/10 transform hover:-translate-y-2">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+              <div className="relative">
+                <div className="w-14 h-14 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-yellow-400/20 group-hover:scale-110 transition-transform duration-300">
+                  <Shirt className="w-7 h-7 text-black" />
+                </div>
+                <h3 className="text-xl lg:text-2xl font-bold text-white mb-3 group-hover:text-yellow-400 transition-colors duration-300">
+                  Apparel & Merchandise Printing
+                </h3>
+                <p className="text-gray-400 mb-6 leading-relaxed">
+                  Custom uniforms, promotional merchandise, and branded apparel that turn your team and customers into brand ambassadors.
+                </p>
+                <Link
+                  to="/services"
+                  className="inline-flex items-center text-yellow-400 font-semibold hover:text-yellow-300 transition-colors duration-200 group/btn"
+                >
+                  Learn More
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-200" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Creative Print Consultancy */}
+            <div className="group relative bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl p-8 lg:p-10 border border-gray-700/50 hover:border-yellow-400/30 transition-all duration-500 hover:shadow-2xl hover:shadow-yellow-400/10 transform hover:-translate-y-2">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+              <div className="relative">
+                <div className="w-14 h-14 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-yellow-400/20 group-hover:scale-110 transition-transform duration-300">
+                  <Lightbulb className="w-7 h-7 text-black" />
+                </div>
+                <h3 className="text-xl lg:text-2xl font-bold text-white mb-3 group-hover:text-yellow-400 transition-colors duration-300">
+                  Creative Print Consultancy
+                </h3>
+                <p className="text-gray-400 mb-6 leading-relaxed">
+                  Expert guidance on materials, techniques, and strategies to maximize the impact and ROI of your print investments.
+                </p>
+                <Link
+                  to="/services"
+                  className="inline-flex items-center text-yellow-400 font-semibold hover:text-yellow-300 transition-colors duration-200 group/btn"
+                >
+                  Learn More
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-200" />
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA Button */}
+          <div className="text-center mt-14">
+            <Link
+              to="/contact"
+              className="inline-flex items-center px-10 py-5 bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-bold text-lg rounded-xl 
+                       hover:from-yellow-500 hover:to-amber-600 transition-all duration-300 shadow-xl shadow-yellow-400/20 
+                       hover:shadow-2xl hover:shadow-yellow-400/30 transform hover:scale-105"
+            >
+              Discuss Your Project
+              <ArrowRight className="ml-3 w-5 h-5" />
             </Link>
           </div>
         </div>
