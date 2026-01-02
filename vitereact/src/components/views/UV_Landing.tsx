@@ -552,6 +552,170 @@ const UV_Landing: React.FC = () => {
         </div>
       </section>
 
+      {/* Best Sellers Section */}
+      <section className="py-16 md:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Header */}
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Best Sellers — Our Most Ordered Print Products
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Shop our top-rated print products trusted by thousands of happy customers
+            </p>
+          </div>
+
+          {/* Best Sellers Grid - Horizontal Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Business Cards */}
+            <div className="group relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="relative h-48 bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center">
+                <CreditCard className="w-20 h-20 text-blue-500 group-hover:scale-110 transition-transform duration-300" />
+                <span className="absolute top-3 right-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                  Popular
+                </span>
+              </div>
+              <div className="p-5">
+                <h3 className="text-lg font-bold text-gray-900 mb-1">100 Business Cards</h3>
+                <p className="text-yellow-600 font-semibold text-xl mb-3">From €17.50</p>
+                <Link
+                  to="/services"
+                  className="w-full inline-flex items-center justify-center px-5 py-2.5 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors duration-200"
+                >
+                  Order Now
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Flyers */}
+            <div className="group relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="relative h-48 bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center">
+                <FileText className="w-20 h-20 text-orange-500 group-hover:scale-110 transition-transform duration-300" />
+                <span className="absolute top-3 right-3 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                  Best Value
+                </span>
+              </div>
+              <div className="p-5">
+                <h3 className="text-lg font-bold text-gray-900 mb-1">Flyers</h3>
+                <p className="text-yellow-600 font-semibold text-xl mb-3">From €25</p>
+                <Link
+                  to="/services"
+                  className="w-full inline-flex items-center justify-center px-5 py-2.5 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors duration-200"
+                >
+                  Order Now
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Vinyl Banners */}
+            <div className="group relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="relative h-48 bg-gradient-to-br from-purple-100 to-violet-100 flex items-center justify-center">
+                <Image className="w-20 h-20 text-purple-500 group-hover:scale-110 transition-transform duration-300" />
+                <span className="absolute top-3 right-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                  Popular
+                </span>
+              </div>
+              <div className="p-5">
+                <h3 className="text-lg font-bold text-gray-900 mb-1">Vinyl Banners</h3>
+                <p className="text-yellow-600 font-semibold text-xl mb-3">From €40</p>
+                <Link
+                  to="/services"
+                  className="w-full inline-flex items-center justify-center px-5 py-2.5 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors duration-200"
+                >
+                  Order Now
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Stickers */}
+            <div className="group relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="relative h-48 bg-gradient-to-br from-pink-100 to-rose-100 flex items-center justify-center">
+                <Tag className="w-20 h-20 text-pink-500 group-hover:scale-110 transition-transform duration-300" />
+                <span className="absolute top-3 right-3 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                  Best Value
+                </span>
+              </div>
+              <div className="p-5">
+                <h3 className="text-lg font-bold text-gray-900 mb-1">Stickers</h3>
+                <p className="text-yellow-600 font-semibold text-xl mb-3">From €12</p>
+                <Link
+                  to="/services"
+                  className="w-full inline-flex items-center justify-center px-5 py-2.5 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors duration-200"
+                >
+                  Order Now
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Slim Promo Bar */}
+      <section className="py-4 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-400">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 text-black font-semibold text-sm md:text-base">
+            <div className="flex items-center gap-2">
+              <Tag className="w-5 h-5" />
+              <span>Special Offers</span>
+            </div>
+            <span className="hidden sm:block text-black/50">•</span>
+            <div className="flex items-center gap-2">
+              <Package className="w-5 h-5" />
+              <span>Bulk Discounts</span>
+            </div>
+            <span className="hidden sm:block text-black/50">•</span>
+            <div className="flex items-center gap-2">
+              <Truck className="w-5 h-5" />
+              <span>Free Delivery on Select Orders</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Customer Confidence Strip */}
+      <section className="py-10 md:py-14 bg-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8">
+            {/* Fast Delivery */}
+            <div className="flex items-center justify-center gap-4 bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300">
+              <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <Truck className="w-7 h-7 text-green-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900 text-lg">Fast Delivery</h3>
+                <p className="text-gray-600 text-sm">Quick turnaround times</p>
+              </div>
+            </div>
+
+            {/* Premium Quality */}
+            <div className="flex items-center justify-center gap-4 bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300">
+              <div className="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <Award className="w-7 h-7 text-yellow-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900 text-lg">Premium Quality</h3>
+                <p className="text-gray-600 text-sm">Guaranteed satisfaction</p>
+              </div>
+            </div>
+
+            {/* Local Business Support */}
+            <div className="flex items-center justify-center gap-4 bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300">
+              <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <Store className="w-7 h-7 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900 text-lg">Local Business Support</h3>
+                <p className="text-gray-600 text-sm">Supporting Irish businesses</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Top Selling Services Section */}
       <section className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
