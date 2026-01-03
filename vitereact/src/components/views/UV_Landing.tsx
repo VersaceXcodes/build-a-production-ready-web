@@ -180,14 +180,13 @@ const UV_Landing: React.FC = () => {
             </div>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              Personalise First,
+              Disciplined Premium Print,
               <br />
-              <span className="text-yellow-400">Deliver Excellence</span>
+              <span className="text-yellow-400">Signage & Branding</span>
             </h1>
 
             <p className="text-lg md:text-xl text-gray-300 mb-10 max-w-3xl mx-auto leading-relaxed">
-              From business cards to vehicle graphics, we bring your brand to life with 
-              disciplined timelines, transparent pricing, and uncompromising quality.
+              Professional branding that is accessible and dependable
             </p>
 
             {/* Dual CTAs - Larger and more visible */}
@@ -198,7 +197,7 @@ const UV_Landing: React.FC = () => {
                          hover:bg-yellow-500 transition-all duration-300 transform hover:scale-105 
                          shadow-lg hover:shadow-yellow-400/30 hover:shadow-2xl flex items-center justify-center"
               >
-                Get Your Custom Quote
+                Get a Quote
                 <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />
               </button>
 
@@ -209,7 +208,7 @@ const UV_Landing: React.FC = () => {
                          shadow-lg hover:shadow-white/20 hover:shadow-xl transform hover:scale-105
                          flex items-center justify-center"
               >
-                View Our Portfolio
+                View Gallery
               </Link>
             </div>
           </div>
@@ -814,7 +813,7 @@ const UV_Landing: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">
-              Our Recent Work
+              See Previous Work
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               See how we've helped businesses stand out with stunning print and branding solutions
@@ -1031,7 +1030,7 @@ const UV_Landing: React.FC = () => {
       <section className="py-16 md:py-20 bg-gradient-to-br from-yellow-400 to-yellow-500">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">
-            Ready to Elevate Your Brand?
+            Ready to Get Started?
           </h2>
           <p className="text-lg text-gray-900 mb-8 max-w-2xl mx-auto">
             Get your custom quote in minutes and start your project with Ireland's 
